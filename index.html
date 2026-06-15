@@ -567,72 +567,13 @@ function saveFav(){
 }
 
 /* ══════════════════════════════════════
-   FİNANS
+   FİNANS — HuggingFace Space proxy
+   Deploy ettikten sonra sadece API_URL'yi güncelle
 ══════════════════════════════════════ */
+const API_URL='https://KULLANICI_ADINIZ-startpage-api.hf.space/market';
+
 let usdTRY=38.5;
 
-async function fetchWithProxy(url){
-  const proxies=[
-    `https://corsproxy.io/?${encodeURIComponent(url)}`,
-    `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-    url
-  ];
-  for(const p of proxies){
-    try{
-      const r=await fetch(p,{signal:AbortSignal.timeout(9000)});
-      if(!r.ok) continue;
-      const txt=await r.text();
-      if(!txt||txt.trimStart().startsWith('<')) continue;
-      return JSON.parse(txt);
-    }catch{}
-  }
-  return null;
-}
-
-/* FX — Frankfurter (tek istek, cross-rate hesaplama) */
-async function fetchFX(){
-  const d=await fetchWithProxy('https://api.frankfurter.app/latest?from=USD&to=TRY,EUR,GBP');
-  if(d?.rates){
-    const {TRY:tryR,EUR:eurR,GBP:gbpR}=d.rates;
-    if(tryR){usdTRY=tryR; setVal('l-usd',fmt(tryR,4));}
-    if(tryR&&eurR) setVal('l-eur',fmt(tryR/eurR,4));   /* EUR/TRY */
-    if(tryR&&gbpR) setVal('l-gbp',fmt(tryR/gbpR,4));   /* GBP/TRY */
-    if(eurR)       setVal('l-eurusd',fmt(1/eurR,4));    /* EUR/USD */
-  }
-}
-
-/* Kripto — CoinGecko */
-async function fetchCrypto(){
-  const d=await fetchWithProxy(
-    'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd&include_24hr_change=true'
-  );
-  if(!d) return;
-  const map={bitcoin:['l-btc','l-btc-c'],ethereum:['l-eth','l-eth-c'],solana:['l-sol','l-sol-c']};
-  for(const [id,[v,c]] of Object.entries(map)){
-    if(d[id]){setVal(v,'$'+fmtK(d[id].usd));setChg(c,d[id].usd_24h_change);}
-  }
-}
-
-/* Metaller — metals.live */
-async function fetchMetals(){
-  const arr=await fetchWithProxy('https://api.metals.live/v1/spot');
-  if(!arr||!Array.isArray(arr)) return;
-  let xau=null,xag=null,xpt=null;
-  for(const item of arr){
-    if(item.gold!=null)     xau=item.gold;
-    if(item.silver!=null)   xag=item.silver;
-    if(item.platinum!=null) xpt=item.platinum;
-  }
-  if(xau!=null){
-    setVal('l-xau-usd','$'+fmt(xau,0));
-    setVal('l-xau-try',fmt(xau*usdTRY,0)+' ₺');
-    setVal('l-xau-ratio',fmt(xau/(usdTRY||1),1));
-  }
-  if(xag!=null) setVal('l-xag','$'+fmt(xag,3));
-  if(xpt!=null) setVal('l-xpt','$'+fmt(xpt,0));
-}
-
-/* Yahoo Finance — v7/quote ile tek istekte tümü */
 const STOCKS=[
   ['THYAO.IS','r-thyao','r-thyao-c',false],
   ['GARAN.IS','r-garan','r-garan-c',false],
@@ -648,48 +589,63 @@ const STOCKS=[
   ['CL=F',    'r-oil',  'r-oil-c',  false],
 ];
 
-async function fetchBIST(){
-  const ico=$('bist-ico'); ico.classList.add('spin');
+function applyMarketData(data){
+  /* FX */
+  const fx=data.fx||{};
+  if(fx.usd_try){usdTRY=fx.usd_try; setVal('l-usd',fmt(fx.usd_try,4));}
+  if(fx.eur_try) setVal('l-eur',fmt(fx.eur_try,4));
+  if(fx.gbp_try) setVal('l-gbp',fmt(fx.gbp_try,4));
+  if(fx.eur_usd) setVal('l-eurusd',fmt(fx.eur_usd,4));
 
-  const syms=STOCKS.map(([s])=>encodeURIComponent(s)).join(',');
-  const url=`https://query1.finance.yahoo.com/v7/finance/quote?symbols=${syms}&fields=regularMarketPrice,regularMarketChangePercent`;
-  const d=await fetchWithProxy(url);
+  /* Metaller */
+  const m=data.metals||{};
+  if(m.gold!=null){
+    setVal('l-xau-usd','$'+fmt(m.gold,0));
+    setVal('l-xau-try',fmt(m.gold*usdTRY,0)+' ₺');
+    setVal('l-xau-ratio',fmt(m.gold/(usdTRY||1),1));
+  }
+  if(m.silver!=null)   setVal('l-xag','$'+fmt(m.silver,3));
+  if(m.platinum!=null) setVal('l-xpt','$'+fmt(m.platinum,0));
 
-  if(d?.quoteResponse?.result?.length){
-    const bySymbol={};
-    for(const r of d.quoteResponse.result) bySymbol[r.symbol]=r;
-    for(const [sym,vid,cid,kfmt] of STOCKS){
-      const r=bySymbol[sym]||bySymbol[sym.toUpperCase()];
-      if(!r?.regularMarketPrice) continue;
-      setVal(vid,kfmt?fmtK(r.regularMarketPrice):fmt(r.regularMarketPrice,2));
-      if(r.regularMarketChangePercent!=null) setChg(cid,r.regularMarketChangePercent);
+  /* Kripto */
+  const c=data.crypto||{};
+  const cryptoMap={bitcoin:['l-btc','l-btc-c'],ethereum:['l-eth','l-eth-c'],solana:['l-sol','l-sol-c']};
+  for(const [id,[v,chg]] of Object.entries(cryptoMap)){
+    if(c[id]){
+      setVal(v,'$'+fmtK(c[id].price));
+      setChg(chg,c[id].change24h);
     }
-  } else {
-    /* fallback: v8/chart ayrı ayrı */
-    await Promise.allSettled(STOCKS.map(([s,v,c,k])=>yahoov8(s,v,c,k)));
   }
 
+  /* Hisseler */
+  const s=data.stocks||{};
+  for(const [sym,vid,cid,kfmt] of STOCKS){
+    const r=s[sym];
+    if(!r?.price) continue;
+    setVal(vid,kfmt?fmtK(r.price):fmt(r.price,2));
+    if(r.change_pct!=null) setChg(cid,r.change_pct);
+  }
+}
+
+async function fetchBIST(){
+  const ico=$('bist-ico'); ico.classList.add('spin');
+  try{
+    const r=await fetch(API_URL,{signal:AbortSignal.timeout(20000)});
+    if(r.ok){
+      const data=await r.json();
+      applyMarketData(data);
+    }
+  }catch(e){
+    console.warn('API hatası:',e);
+  }
   ico.classList.remove('spin');
   const n=new Date();
   $('last-upd').textContent=pad(n.getHours())+':'+pad(n.getMinutes());
 }
 
-async function yahoov8(sym,valId,chgId,kfmt){
-  const url=`https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?interval=1d&range=2d`;
-  const d=await fetchWithProxy(url);
-  if(!d) return;
-  const meta=d.chart?.result?.[0]?.meta;
-  if(!meta?.regularMarketPrice) return;
-  setVal(valId,kfmt?fmtK(meta.regularMarketPrice):fmt(meta.regularMarketPrice,2));
-  if(chgId&&meta.chartPreviousClose)
-    setChg(chgId,(meta.regularMarketPrice-meta.chartPreviousClose)/meta.chartPreviousClose*100);
-}
-
 $('bist-refresh').addEventListener('click',fetchBIST);
 
 async function fetchAll(){
-  await fetchFX();
-  await Promise.allSettled([fetchCrypto(),fetchMetals()]);
   await fetchBIST();
 }
 fetchAll();
