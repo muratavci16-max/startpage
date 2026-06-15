@@ -1,8 +1,9 @@
 import asyncio
-from concurrent.futures import ThreadPoolExecutor
+from datetime import date, timedelta
+from typing import Optional
+
 import httpx
-import yfinance as yf
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Startpage Market API")
@@ -13,87 +14,78 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-STOCK_SYMBOLS = [
+DEFAULT_SYMBOLS = [
     "THYAO.IS", "GARAN.IS", "AKBNK.IS", "EREGL.IS",
     "ASELS.IS", "SISE.IS", "KCHOL.IS", "XU100.IS",
     "^GSPC", "^NDX", "^GDAXI", "CL=F",
 ]
 
-YF_HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/120.0.0.0 Safari/537.36"
-    ),
-    "Accept": "application/json,text/plain,*/*",
-    "Accept-Language": "en-US,en;q=0.9",
-    "Referer": "https://finance.yahoo.com/",
+# Yahoo Finance → Stooq symbol mapping
+STOOQ_MAP = {
+    "^GSPC":  "^spx",
+    "^NDX":   "^ndq",
+    "^GDAXI": "^dax",
+    "^DJI":   "^dji",
+    "^IXIC":  "^ixic",
+    "^FTSE":  "^ukx",
+    "^N225":  "^nkx",
+    "CL=F":   "cl.f",
+    "GC=F":   "gc.f",
+    "SI=F":   "si.f",
+    "BTC-USD": "btc.v",
+    "ETH-USD": "eth.v",
 }
 
-_executor = ThreadPoolExecutor(max_workers=4)
+STOOQ_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    "Accept": "text/html,*/*",
+}
 
 
-# ── helpers ──────────────────────────────────────────────
+def to_stooq(sym: str) -> str:
+    upper = sym.upper()
+    if upper in STOOQ_MAP:
+        return STOOQ_MAP[upper]
+    if upper.endswith(".IS"):
+        return sym.lower()
+    # Plain US ticker: AAPL → aapl.us
+    if not sym.startswith("^") and "." not in sym and "=" not in sym and "-" not in sym:
+        return sym.lower() + ".us"
+    return sym.lower()
 
-def _ticker_history(sym: str):
-    """Fetch price + change via yfinance .history(). Returns (price, change_pct) or (None, None)."""
+
+async def fetch_stock_stooq(client: httpx.AsyncClient, sym: str):
+    stooq_sym = to_stooq(sym)
+    d_to   = date.today().strftime("%Y%m%d")
+    d_from = (date.today() - timedelta(days=14)).strftime("%Y%m%d")
+    url = f"https://stooq.com/q/d/l/?s={stooq_sym}&d1={d_from}&d2={d_to}&i=d"
     try:
-        hist = yf.Ticker(sym).history(period="5d", interval="1d")
-        if hist.empty:
+        r = await client.get(url, timeout=12)
+        lines = [l for l in r.text.strip().splitlines() if l and not l.lower().startswith("date")]
+        if not lines:
             return None, None
-        price = float(hist["Close"].iloc[-1])
-        prev  = float(hist["Close"].iloc[-2]) if len(hist) > 1 else None
-        chg   = (price - prev) / prev * 100 if prev else None
-        return round(price, 2), (round(chg, 2) if chg is not None else None)
-    except Exception:
+        # Each row: Date,Open,High,Low,Close,Volume
+        close = float(lines[-1].split(",")[4])
+        prev  = float(lines[-2].split(",")[4]) if len(lines) > 1 else None
+        chg   = (close - prev) / prev * 100 if prev else None
+        return round(close, 2), (round(chg, 2) if chg is not None else None)
+    except Exception as e:
+        print(f"Stooq failed [{sym}→{stooq_sym}]: {e}")
         return None, None
 
 
-async def _yahoo_quote_httpx(client: httpx.AsyncClient, sym: str):
-    """Direct Yahoo Finance v8/chart call — server-side, no CORS."""
-    try:
-        url = f"https://query2.finance.yahoo.com/v8/finance/chart/{sym}?interval=1d&range=5d"
-        r = await client.get(url, timeout=10)
-        if r.status_code != 200:
-            return None, None
-        meta = r.json()["chart"]["result"][0]["meta"]
-        price = meta.get("regularMarketPrice")
-        prev  = meta.get("chartPreviousClose")
-        if price is None:
-            return None, None
-        chg = (price - prev) / prev * 100 if prev else None
-        return round(price, 2), (round(chg, 2) if chg is not None else None)
-    except Exception:
-        return None, None
-
-
-async def fetch_stocks():
-    result = {}
-    loop = asyncio.get_event_loop()
-
-    # Try yfinance history() in thread pool first
-    futures = {sym: loop.run_in_executor(_executor, _ticker_history, sym) for sym in STOCK_SYMBOLS}
-    yf_results = {sym: await fut for sym, fut in futures.items()}
-
-    missing = [sym for sym, (p, _) in yf_results.items() if p is None]
-
-    # Fallback: direct httpx calls for any that failed
-    if missing:
-        async with httpx.AsyncClient(headers=YF_HEADERS, follow_redirects=True) as client:
-            httpx_results = await asyncio.gather(
-                *[_yahoo_quote_httpx(client, sym) for sym in missing]
-            )
-        for sym, (price, chg) in zip(missing, httpx_results):
-            yf_results[sym] = (price, chg)
-
-    for sym, (price, chg) in yf_results.items():
+async def fetch_stocks(symbols: list[str]) -> dict:
+    async with httpx.AsyncClient(headers=STOOQ_HEADERS, follow_redirects=True) as client:
+        tasks = [fetch_stock_stooq(client, sym) for sym in symbols]
+        results = await asyncio.gather(*tasks)
+    out = {}
+    for sym, (price, chg) in zip(symbols, results):
         if price is not None:
-            result[sym] = {"price": price, "change_pct": chg}
+            out[sym] = {"price": price, "change_pct": chg}
+    return out
 
-    return result
 
-
-async def fetch_fx():
+async def fetch_fx() -> dict:
     try:
         async with httpx.AsyncClient(timeout=8) as client:
             r = await client.get(
@@ -104,16 +96,17 @@ async def fetch_fx():
             rates = r.json().get("rates", {})
             t, e, g = rates.get("TRY"), rates.get("EUR"), rates.get("GBP")
             return {
-                "usd_try": round(t, 4)           if t else None,
-                "eur_try": round(t / e, 4)        if t and e else None,
-                "gbp_try": round(t / g, 4)        if t and g else None,
-                "eur_usd": round(1 / e, 4)        if e else None,
+                "usd_try": round(t, 4)       if t           else None,
+                "eur_try": round(t / e, 4)    if t and e     else None,
+                "gbp_try": round(t / g, 4)    if t and g     else None,
+                "eur_usd": round(1 / e, 4)    if e           else None,
             }
-    except Exception:
+    except Exception as ex:
+        print(f"FX error: {ex}")
         return {}
 
 
-async def fetch_crypto():
+async def fetch_crypto() -> dict:
     try:
         async with httpx.AsyncClient(timeout=8) as client:
             r = await client.get(
@@ -134,11 +127,12 @@ async def fetch_crypto():
             for coin in ("bitcoin", "ethereum", "solana")
             if coin in data
         }
-    except Exception:
+    except Exception as ex:
+        print(f"Crypto error: {ex}")
         return {}
 
 
-async def fetch_metals():
+async def fetch_metals() -> dict:
     try:
         async with httpx.AsyncClient(timeout=8) as client:
             r = await client.get("https://api.metals.live/v1/spot")
@@ -150,18 +144,22 @@ async def fetch_metals():
             if item.get("silver")   is not None: silver   = item["silver"]
             if item.get("platinum") is not None: platinum = item["platinum"]
         return {"gold": gold, "silver": silver, "platinum": platinum}
-    except Exception:
+    except Exception as ex:
+        print(f"Metals error: {ex}")
         return {}
 
 
-# ── endpoints ────────────────────────────────────────────
-
 @app.get("/market")
-async def market():
+async def market(symbols: Optional[str] = Query(default=None)):
+    sym_list = (
+        [s.strip() for s in symbols.split(",") if s.strip()]
+        if symbols else DEFAULT_SYMBOLS
+    )
+
     fx_task     = asyncio.create_task(fetch_fx())
     crypto_task = asyncio.create_task(fetch_crypto())
     metals_task = asyncio.create_task(fetch_metals())
-    stocks      = await fetch_stocks()
+    stocks      = await fetch_stocks(sym_list)
 
     return {
         "fx":     await fx_task,
