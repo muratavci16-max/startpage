@@ -34,6 +34,20 @@ YF_HEADERS = {
 
 _yf_cookies: dict = {}
 
+# Simple TTL cache for rate-limited sources
+import time
+_cache: dict = {}   # key → (data, expires_at)
+
+def _cached(key: str, ttl: int):
+    """Return cached value if still fresh, else None."""
+    entry = _cache.get(key)
+    if entry and time.monotonic() < entry[1]:
+        return entry[0]
+    return None
+
+def _set_cache(key: str, data, ttl: int):
+    _cache[key] = (data, time.monotonic() + ttl)
+
 
 @app.on_event("startup")
 async def _warmup():
@@ -125,27 +139,40 @@ async def fetch_fx() -> dict:
         return {}
 
 
-# ── CRYPTO (CoinCap — free, no auth, no geo-block) ───────
+# ── CRYPTO (CoinGecko — cached 5 min to avoid 429) ───────
 
 async def fetch_crypto() -> dict:
+    cached = _cached("crypto", 300)
+    if cached is not None:
+        return cached
+
     try:
         async with httpx.AsyncClient(timeout=10) as client:
             r = await client.get(
-                "https://api.coincap.io/v2/assets",
-                params={"ids": "bitcoin,ethereum,solana", "limit": "3"},
+                "https://api.coingecko.com/api/v3/simple/price",
+                params={
+                    "ids": "bitcoin,ethereum,solana",
+                    "vs_currencies": "usd",
+                    "include_24hr_change": "true",
+                },
             )
             r.raise_for_status()
-        return {
-            item["id"]: {
-                "price":     float(item["priceUsd"]),
-                "change24h": float(item["changePercent24Hr"]),
+            data = r.json()
+        result = {
+            coin: {
+                "price":     data[coin]["usd"],
+                "change24h": data[coin].get("usd_24h_change"),
             }
-            for item in r.json().get("data", [])
-            if item.get("priceUsd") and item.get("changePercent24Hr")
+            for coin in ("bitcoin", "ethereum", "solana")
+            if coin in data
         }
+        _set_cache("crypto", result, 300)
+        return result
     except Exception as ex:
         print(f"Crypto error: {ex}")
-        return {}
+        # Return stale cache if available
+        stale = _cache.get("crypto")
+        return stale[0] if stale else {}
 
 
 # ── MARKET ────────────────────────────────────────────────
