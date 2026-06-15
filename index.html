@@ -363,9 +363,9 @@ function tick(){
   const n=new Date();
   $('clock').textContent=pad(n.getHours())+':'+pad(n.getMinutes());
   $('datestr').textContent=DAYS[n.getDay()]+', '+n.getDate()+' '+MONTHS[n.getMonth()]+' '+n.getFullYear();
-  tickWorldClocks();
+  if(typeof cfg!=='undefined') tickWorldClocks();
 }
-setInterval(tick,1000);tick();
+/* setInterval started after cfg is initialized below */
 
 /* ── SETTINGS & BACKGROUND ── */
 const BG_PRESETS=[
@@ -400,6 +400,7 @@ function applyBg(){
   ovEl.style.background=`rgba(0,0,0,${cfg.dim/100})`;
 }
 applyBg();
+setInterval(tick,1000);tick();   /* start clock after cfg is ready */
 
 BG_PRESETS.forEach(p=>{
   const el=document.createElement('div');
