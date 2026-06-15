@@ -1,5 +1,5 @@
 import asyncio
-from datetime import date, timedelta
+import json
 from typing import Optional
 
 import httpx
@@ -20,76 +20,105 @@ DEFAULT_SYMBOLS = [
     "^GSPC", "^NDX", "^GDAXI", "CL=F",
 ]
 
-# Yahoo Finance → Stooq symbol mapping
-STOOQ_MAP = {
-    "^GSPC":  "^spx",
-    "^NDX":   "^ndq",
-    "^GDAXI": "^dax",
-    "^DJI":   "^dji",
-    "^IXIC":  "^ixic",
-    "^FTSE":  "^ukx",
-    "^N225":  "^nkx",
-    "CL=F":   "cl.f",
-    "GC=F":   "gc.f",
-    "SI=F":   "si.f",
-    "BTC-USD": "btc.v",
-    "ETH-USD": "eth.v",
+METALS_SYMBOLS = ["GC=F", "SI=F", "PL=F"]   # Gold, Silver, Platinum futures
+
+YF_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/124.0.0.0 Safari/537.36"
+    ),
+    "Accept": "*/*",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Origin": "https://finance.yahoo.com",
+    "Referer": "https://finance.yahoo.com/",
 }
 
-STOOQ_HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-    "Accept": "text/html,*/*",
-}
+_crumb: Optional[str] = None
+_yf_cookies: dict = {}
 
 
-def to_stooq(sym: str) -> str:
-    upper = sym.upper()
-    if upper in STOOQ_MAP:
-        return STOOQ_MAP[upper]
-    if upper.endswith(".IS"):
-        return sym.lower()
-    # Plain US ticker: AAPL → aapl.us
-    if not sym.startswith("^") and "." not in sym and "=" not in sym and "-" not in sym:
-        return sym.lower() + ".us"
-    return sym.lower()
-
-
-async def fetch_stock_stooq(client: httpx.AsyncClient, sym: str):
-    stooq_sym = to_stooq(sym)
-    d_to   = date.today().strftime("%Y%m%d")
-    d_from = (date.today() - timedelta(days=14)).strftime("%Y%m%d")
-    url = f"https://stooq.com/q/d/l/?s={stooq_sym}&d1={d_from}&d2={d_to}&i=d"
+async def _refresh_crumb() -> bool:
+    global _crumb, _yf_cookies
     try:
-        r = await client.get(url, timeout=12)
-        lines = [l for l in r.text.strip().splitlines() if l and not l.lower().startswith("date")]
-        if not lines:
-            return None, None
-        # Each row: Date,Open,High,Low,Close,Volume
-        close = float(lines[-1].split(",")[4])
-        prev  = float(lines[-2].split(",")[4]) if len(lines) > 1 else None
-        chg   = (close - prev) / prev * 100 if prev else None
-        return round(close, 2), (round(chg, 2) if chg is not None else None)
+        async with httpx.AsyncClient(
+            headers=YF_HEADERS, follow_redirects=True, timeout=15
+        ) as client:
+            await client.get("https://finance.yahoo.com/")
+            r = await client.get("https://query2.finance.yahoo.com/v1/test/getcrumb")
+            if r.status_code == 200 and r.text.strip():
+                _crumb = r.text.strip()
+                _yf_cookies = dict(client.cookies)
+                print(f"Yahoo crumb OK: {_crumb[:8]}...")
+                return True
+            print(f"Crumb response: {r.status_code} — {r.text[:80]}")
     except Exception as e:
-        print(f"Stooq failed [{sym}→{stooq_sym}]: {e}")
-        return None, None
+        print(f"Crumb refresh error: {e}")
+    return False
 
 
-async def fetch_stocks(symbols: list[str]) -> dict:
-    async with httpx.AsyncClient(headers=STOOQ_HEADERS, follow_redirects=True) as client:
-        tasks = [fetch_stock_stooq(client, sym) for sym in symbols]
-        results = await asyncio.gather(*tasks)
-    out = {}
-    for sym, (price, chg) in zip(symbols, results):
-        if price is not None:
-            out[sym] = {"price": price, "change_pct": chg}
-    return out
+async def _yahoo_quote(symbols: list[str]) -> dict:
+    """Fetch regularMarketPrice + regularMarketChangePercent via Yahoo v7/quote."""
+    global _crumb, _yf_cookies
 
+    if not _crumb:
+        await _refresh_crumb()
+    if not _crumb:
+        return {}
+
+    sym_str = ",".join(symbols)
+    url = (
+        f"https://query1.finance.yahoo.com/v7/finance/quote"
+        f"?symbols={sym_str}&crumb={_crumb}"
+        f"&fields=regularMarketPrice,regularMarketChangePercent"
+    )
+
+    result = {}
+    for attempt in range(2):
+        try:
+            async with httpx.AsyncClient(
+                headers=YF_HEADERS,
+                cookies=_yf_cookies,
+                follow_redirects=True,
+                timeout=15,
+            ) as client:
+                r = await client.get(url)
+            if r.status_code == 401 and attempt == 0:
+                print("Crumb expired — refreshing...")
+                await _refresh_crumb()
+                url = (
+                    f"https://query1.finance.yahoo.com/v7/finance/quote"
+                    f"?symbols={sym_str}&crumb={_crumb}"
+                    f"&fields=regularMarketPrice,regularMarketChangePercent"
+                )
+                continue
+            if r.status_code != 200:
+                print(f"Yahoo quote {r.status_code}: {r.text[:120]}")
+                break
+            for item in r.json().get("quoteResponse", {}).get("result", []):
+                sym   = item.get("symbol")
+                price = item.get("regularMarketPrice")
+                chg   = item.get("regularMarketChangePercent")
+                if sym and price is not None:
+                    result[sym] = {
+                        "price":      round(price, 2),
+                        "change_pct": round(chg, 2) if chg is not None else None,
+                    }
+            break
+        except Exception as e:
+            print(f"Yahoo quote error (attempt {attempt}): {e}")
+            break
+
+    return result
+
+
+# ── FX ────────────────────────────────────────────────────
 
 async def fetch_fx() -> dict:
     try:
-        async with httpx.AsyncClient(timeout=8) as client:
+        async with httpx.AsyncClient(timeout=10, follow_redirects=True) as client:
             r = await client.get(
-                "https://api.frankfurter.app/latest",
+                "https://api.frankfurter.dev/v1/latest",
                 params={"from": "USD", "to": "TRY,EUR,GBP"},
             )
             r.raise_for_status()
@@ -106,65 +135,59 @@ async def fetch_fx() -> dict:
         return {}
 
 
+# ── CRYPTO (Binance — free, no rate limits) ───────────────
+
 async def fetch_crypto() -> dict:
     try:
-        async with httpx.AsyncClient(timeout=8) as client:
+        syms_json = json.dumps(["BTCUSDT", "ETHUSDT", "SOLUSDT"])
+        async with httpx.AsyncClient(timeout=10) as client:
             r = await client.get(
-                "https://api.coingecko.com/api/v3/simple/price",
-                params={
-                    "ids": "bitcoin,ethereum,solana",
-                    "vs_currencies": "usd",
-                    "include_24hr_change": "true",
-                },
+                "https://api.binance.com/api/v3/ticker/24hr",
+                params={"symbols": syms_json},
             )
             r.raise_for_status()
-            data = r.json()
+        mapping = {"BTCUSDT": "bitcoin", "ETHUSDT": "ethereum", "SOLUSDT": "solana"}
         return {
-            coin: {
-                "price":     data[coin].get("usd"),
-                "change24h": data[coin].get("usd_24h_change"),
+            mapping[item["symbol"]]: {
+                "price":     float(item["lastPrice"]),
+                "change24h": float(item["priceChangePercent"]),
             }
-            for coin in ("bitcoin", "ethereum", "solana")
-            if coin in data
+            for item in r.json()
+            if item["symbol"] in mapping
         }
     except Exception as ex:
         print(f"Crypto error: {ex}")
         return {}
 
 
-async def fetch_metals() -> dict:
-    try:
-        async with httpx.AsyncClient(timeout=8) as client:
-            r = await client.get("https://api.metals.live/v1/spot")
-            r.raise_for_status()
-            arr = r.json()
-        gold = silver = platinum = None
-        for item in arr:
-            if item.get("gold")     is not None: gold     = item["gold"]
-            if item.get("silver")   is not None: silver   = item["silver"]
-            if item.get("platinum") is not None: platinum = item["platinum"]
-        return {"gold": gold, "silver": silver, "platinum": platinum}
-    except Exception as ex:
-        print(f"Metals error: {ex}")
-        return {}
-
+# ── MARKET ────────────────────────────────────────────────
 
 @app.get("/market")
 async def market(symbols: Optional[str] = Query(default=None)):
-    sym_list = (
+    user_syms = (
         [s.strip() for s in symbols.split(",") if s.strip()]
         if symbols else DEFAULT_SYMBOLS
     )
 
+    # Fetch user stocks + metals futures in one Yahoo call
+    all_syms = list(dict.fromkeys(user_syms + METALS_SYMBOLS))
+
     fx_task     = asyncio.create_task(fetch_fx())
     crypto_task = asyncio.create_task(fetch_crypto())
-    metals_task = asyncio.create_task(fetch_metals())
-    stocks      = await fetch_stocks(sym_list)
+    all_quotes  = await _yahoo_quote(all_syms)
+
+    # Split metals out
+    metals = {}
+    for yf_sym, key in [("GC=F", "gold"), ("SI=F", "silver"), ("PL=F", "platinum")]:
+        if yf_sym in all_quotes:
+            metals[key] = all_quotes.pop(yf_sym)["price"]
+
+    stocks = {k: v for k, v in all_quotes.items() if k in user_syms}
 
     return {
         "fx":     await fx_task,
         "crypto": await crypto_task,
-        "metals": await metals_task,
+        "metals": metals,
         "stocks": stocks,
     }
 
