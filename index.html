@@ -122,6 +122,11 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',system-ui,s
 .fav-item:hover .fav-del{display:flex}
 .fav-del:hover{color:var(--dn)}
 
+.stock-row{position:relative}
+.stock-del{display:none;position:absolute;right:-2px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted2);cursor:pointer;padding:2px 4px;border-radius:4px;font-size:11px;line-height:1;transition:color .12s}
+.s-row:hover .stock-del{display:block}
+.stock-del:hover{color:var(--dn)}
+
 .add-btn{
   display:flex;align-items:center;gap:7px;cursor:pointer;
   padding:8px 18px;border-radius:20px;
@@ -277,23 +282,12 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',system-ui,s
 <div class="sidebar right">
   <div class="sb-hd">
     <div class="logo"><div class="logo-dot"></div><span class="logo-txt">borsa</span></div>
-    <button class="ref-btn" id="bist-refresh" aria-label="Yenile"><i class="ti ti-refresh" id="bist-ico"></i></button>
+    <div style="display:flex;gap:4px">
+      <button class="ref-btn" id="stock-add-btn" title="Hisse Ekle"><i class="ti ti-plus"></i></button>
+      <button class="ref-btn" id="bist-refresh" aria-label="Yenile"><i class="ti ti-refresh" id="bist-ico"></i></button>
+    </div>
   </div>
-  <div class="s-label">bist hisseleri</div>
-  <div class="s-row"><span class="s-name">THYAO</span><div class="s-right"><div class="s-val" id="r-thyao"><span class="ld">···</span></div><div class="s-chg" id="r-thyao-c"></div></div></div>
-  <div class="s-row"><span class="s-name">GARAN</span><div class="s-right"><div class="s-val" id="r-garan"><span class="ld">···</span></div><div class="s-chg" id="r-garan-c"></div></div></div>
-  <div class="s-row"><span class="s-name">AKBNK</span><div class="s-right"><div class="s-val" id="r-akbnk"><span class="ld">···</span></div><div class="s-chg" id="r-akbnk-c"></div></div></div>
-  <div class="s-row"><span class="s-name">EREGL</span><div class="s-right"><div class="s-val" id="r-eregl"><span class="ld">···</span></div><div class="s-chg" id="r-eregl-c"></div></div></div>
-  <div class="s-row"><span class="s-name">ASELS</span><div class="s-right"><div class="s-val" id="r-asels"><span class="ld">···</span></div><div class="s-chg" id="r-asels-c"></div></div></div>
-  <div class="s-row"><span class="s-name">SISE</span><div class="s-right"><div class="s-val" id="r-sise"><span class="ld">···</span></div><div class="s-chg" id="r-sise-c"></div></div></div>
-  <div class="s-row"><span class="s-name">KCHOL</span><div class="s-right"><div class="s-val" id="r-kchol"><span class="ld">···</span></div><div class="s-chg" id="r-kchol-c"></div></div></div>
-  <div class="s-label">endeks</div>
-  <div class="s-row"><span class="s-name">BIST 100</span><div class="s-right"><div class="s-val" id="r-xu100"><span class="ld">···</span></div><div class="s-chg" id="r-xu100-c"></div></div></div>
-  <div class="s-label">global</div>
-  <div class="s-row"><span class="s-name">S&amp;P 500</span><div class="s-right"><div class="s-val" id="r-sp500"><span class="ld">···</span></div><div class="s-chg" id="r-sp500-c"></div></div></div>
-  <div class="s-row"><span class="s-name">NASDAQ</span><div class="s-right"><div class="s-val" id="r-ndx"><span class="ld">···</span></div><div class="s-chg" id="r-ndx-c"></div></div></div>
-  <div class="s-row"><span class="s-name">DAX</span><div class="s-right"><div class="s-val" id="r-dax"><span class="ld">···</span></div><div class="s-chg" id="r-dax-c"></div></div></div>
-  <div class="s-row"><span class="s-name">Petrol WTI</span><div class="s-right"><div class="s-val" id="r-oil"><span class="ld">···</span></div><div class="s-chg" id="r-oil-c"></div></div></div>
+  <div id="stocks-container"></div>
   <div class="last-upd">son güncelleme<br><span id="last-upd">—</span></div>
 </div>
 </div>
@@ -307,6 +301,23 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',system-ui,s
     <div class="modal-actions">
       <button class="btn-cancel" id="modal-cancel">iptal</button>
       <button class="btn-save"   id="modal-save">ekle</button>
+    </div>
+  </div>
+</div>
+
+<!-- STOCK ADD MODAL -->
+<div class="modal-bg" id="stock-modal-bg">
+  <div class="modal">
+    <h3><i class="ti ti-chart-line" style="color:var(--accent)"></i>hisse ekle</h3>
+    <input id="sm-sym"  type="text" placeholder="Sembol  (ör: AAPL, THYAO.IS, ^DJI)">
+    <input id="sm-name" type="text" placeholder="Görünen ad  (ör: Apple — boş bırakılabilir)">
+    <p style="font-size:10px;color:var(--muted2);margin:-4px 0 10px;line-height:1.6">
+      BIST: <b>THYAO.IS</b> &nbsp;·&nbsp; ABD: <b>AAPL</b> &nbsp;·&nbsp; Endeks: <b>^GSPC ^NDX ^GDAXI</b><br>
+      Petrol: <b>CL=F</b> &nbsp;·&nbsp; Kripto: <b>BTC-USD</b>
+    </p>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="stock-modal-cancel">iptal</button>
+      <button class="btn-save"   id="stock-modal-save">ekle</button>
     </div>
   </div>
 </div>
@@ -568,26 +579,96 @@ function saveFav(){
 
 /* ══════════════════════════════════════
    FİNANS — HuggingFace Space proxy
-   Deploy ettikten sonra sadece API_URL'yi güncelle
+   Sadece API_BASE'i güncelle
 ══════════════════════════════════════ */
-const API_URL='https://muratmurat16-data-api.hf.space/market';
+const API_BASE='https://muratmurat16-data-api.hf.space';
 
 let usdTRY=38.5;
 
-const STOCKS=[
-  ['THYAO.IS','r-thyao','r-thyao-c',false],
-  ['GARAN.IS','r-garan','r-garan-c',false],
-  ['AKBNK.IS','r-akbnk','r-akbnk-c',false],
-  ['EREGL.IS','r-eregl','r-eregl-c',false],
-  ['ASELS.IS','r-asels','r-asels-c',false],
-  ['SISE.IS', 'r-sise', 'r-sise-c', false],
-  ['KCHOL.IS','r-kchol','r-kchol-c',false],
-  ['XU100.IS','r-xu100','r-xu100-c',true ],
-  ['^GSPC',   'r-sp500','r-sp500-c',true ],
-  ['^NDX',    'r-ndx',  'r-ndx-c',  true ],
-  ['^GDAXI',  'r-dax',  'r-dax-c',  true ],
-  ['CL=F',    'r-oil',  'r-oil-c',  false],
+/* ── STOCKS listesi (localStorage'den) ── */
+const STOCKS_KEY='sp_stocks_v1';
+const DEFAULT_STOCKS=[
+  {sym:'THYAO.IS', name:'THYAO',    kfmt:false, group:'bist'},
+  {sym:'GARAN.IS', name:'GARAN',    kfmt:false, group:'bist'},
+  {sym:'AKBNK.IS', name:'AKBNK',    kfmt:false, group:'bist'},
+  {sym:'EREGL.IS', name:'EREGL',    kfmt:false, group:'bist'},
+  {sym:'ASELS.IS', name:'ASELS',    kfmt:false, group:'bist'},
+  {sym:'SISE.IS',  name:'SISE',     kfmt:false, group:'bist'},
+  {sym:'KCHOL.IS', name:'KCHOL',    kfmt:false, group:'bist'},
+  {sym:'XU100.IS', name:'BIST 100', kfmt:true,  group:'endeks'},
+  {sym:'^GSPC',    name:'S&P 500',  kfmt:true,  group:'global'},
+  {sym:'^NDX',     name:'NASDAQ',   kfmt:true,  group:'global'},
+  {sym:'^GDAXI',   name:'DAX',      kfmt:true,  group:'global'},
+  {sym:'CL=F',     name:'Petrol WTI',kfmt:false,group:'global'},
 ];
+let stockList=[];
+try{const s=localStorage.getItem(STOCKS_KEY);stockList=s?JSON.parse(s):[...DEFAULT_STOCKS];}catch{stockList=[...DEFAULT_STOCKS];}
+function saveStocks(){try{localStorage.setItem(STOCKS_KEY,JSON.stringify(stockList));}catch{}}
+
+/* auto-detect group from symbol */
+function autoGroup(sym){
+  const u=sym.toUpperCase();
+  if(u==='XU100.IS') return 'endeks';
+  if(u.endsWith('.IS')) return 'bist';
+  if(u.startsWith('^')) return 'global';
+  return 'custom';
+}
+/* auto-detect kfmt */
+function autoKfmt(sym){
+  const u=sym.toUpperCase();
+  return u.startsWith('^')||u.includes('XU100')||u.includes('BIST');
+}
+
+/* render right sidebar */
+function renderStocks(){
+  const container=$('stocks-container');
+  const groups={};
+  for(const s of stockList){
+    const g=s.group||autoGroup(s.sym);
+    (groups[g]=groups[g]||[]).push(s);
+  }
+  const ORDER=['bist','endeks','global','custom'];
+  const sorted=ORDER.filter(g=>groups[g]).concat(Object.keys(groups).filter(g=>!ORDER.includes(g)));
+  let html='';
+  for(const g of sorted){
+    html+=`<div class="s-label">${g}</div>`;
+    for(const s of groups[g]){
+      html+=`
+        <div class="s-row stock-row" data-sym="${s.sym}">
+          <span class="s-name">${s.name}</span>
+          <div class="s-right">
+            <div class="s-val"><span class="ld">···</span></div>
+            <div class="s-chg"></div>
+          </div>
+          <button class="stock-del" data-sym="${s.sym}" title="Kaldır"><i class="ti ti-x"></i></button>
+        </div>`;
+    }
+  }
+  container.innerHTML=html;
+  container.querySelectorAll('.stock-del').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      stockList=stockList.filter(s=>s.sym!==btn.dataset.sym);
+      saveStocks(); renderStocks();
+      toast(btn.dataset.sym+' kaldırıldı');
+    });
+  });
+}
+renderStocks();
+
+function applyStockData(stocksData){
+  for(const s of stockList){
+    const r=stocksData[s.sym];
+    const row=document.querySelector(`.stock-row[data-sym="${s.sym}"]`);
+    if(!row||!r?.price) continue;
+    row.querySelector('.s-val').textContent=(s.kfmt||autoKfmt(s.sym))?fmtK(r.price):fmt(r.price,2);
+    const chgEl=row.querySelector('.s-chg');
+    if(r.change_pct!=null){
+      const v=Number(r.change_pct),cls=v>0?'up':v<0?'dn':'',sign=v>0?'+':'';
+      chgEl.innerHTML=`<span class="${cls}">${sign}${fmt(v,2)}%</span>`;
+    }
+  }
+}
 
 function applyMarketData(data){
   /* FX */
@@ -611,43 +692,53 @@ function applyMarketData(data){
   const c=data.crypto||{};
   const cryptoMap={bitcoin:['l-btc','l-btc-c'],ethereum:['l-eth','l-eth-c'],solana:['l-sol','l-sol-c']};
   for(const [id,[v,chg]] of Object.entries(cryptoMap)){
-    if(c[id]){
-      setVal(v,'$'+fmtK(c[id].price));
-      setChg(chg,c[id].change24h);
-    }
+    if(c[id]){setVal(v,'$'+fmtK(c[id].price));setChg(chg,c[id].change24h);}
   }
 
   /* Hisseler */
-  const s=data.stocks||{};
-  for(const [sym,vid,cid,kfmt] of STOCKS){
-    const r=s[sym];
-    if(!r?.price) continue;
-    setVal(vid,kfmt?fmtK(r.price):fmt(r.price,2));
-    if(r.change_pct!=null) setChg(cid,r.change_pct);
-  }
+  applyStockData(data.stocks||{});
 }
 
 async function fetchBIST(){
   const ico=$('bist-ico'); ico.classList.add('spin');
   try{
-    const r=await fetch(API_URL,{signal:AbortSignal.timeout(20000)});
-    if(r.ok){
-      const data=await r.json();
-      applyMarketData(data);
-    }
-  }catch(e){
-    console.warn('API hatası:',e);
-  }
+    const syms=stockList.map(s=>s.sym).join(',');
+    const r=await fetch(`${API_BASE}/market?symbols=${encodeURIComponent(syms)}`,{signal:AbortSignal.timeout(25000)});
+    if(r.ok) applyMarketData(await r.json());
+  }catch(e){console.warn('API hatası:',e);}
   ico.classList.remove('spin');
   const n=new Date();
   $('last-upd').textContent=pad(n.getHours())+':'+pad(n.getMinutes());
 }
-
 $('bist-refresh').addEventListener('click',fetchBIST);
 
-async function fetchAll(){
-  await fetchBIST();
+/* ── STOCK ADD MODAL ── */
+const stockModalBg=$('stock-modal-bg');
+$('stock-add-btn').addEventListener('click',()=>{
+  stockModalBg.classList.add('open');
+  setTimeout(()=>$('sm-sym').focus(),60);
+});
+$('stock-modal-cancel').addEventListener('click',closeStockModal);
+stockModalBg.addEventListener('click',e=>{if(e.target===stockModalBg)closeStockModal();});
+$('sm-sym').addEventListener('keydown',e=>{if(e.key==='Enter')$('sm-name').focus();});
+$('sm-name').addEventListener('keydown',e=>{if(e.key==='Enter')saveStock();});
+$('stock-modal-save').addEventListener('click',saveStock);
+
+function closeStockModal(){stockModalBg.classList.remove('open');$('sm-sym').value='';$('sm-name').value='';}
+function saveStock(){
+  let sym=$('sm-sym').value.trim().toUpperCase();
+  const name=$('sm-name').value.trim()||sym;
+  if(!sym){toast('Sembol giriniz');return;}
+  /* BIST kısaltması girilmişse .IS ekle */
+  if(/^[A-Z]{3,6}$/.test(sym)&&!sym.startsWith('^')) sym=sym+'.IS';
+  if(stockList.find(s=>s.sym===sym)){toast('Bu sembol zaten listede');return;}
+  stockList.push({sym,name,kfmt:autoKfmt(sym),group:autoGroup(sym)});
+  saveStocks(); renderStocks(); closeStockModal();
+  toast(sym+' eklendi ✓');
+  fetchBIST();
 }
+
+async function fetchAll(){await fetchBIST();}
 fetchAll();
 setInterval(fetchAll,2*60*1000);
 </script>
