@@ -13,8 +13,6 @@
 :root{
   --accent:#EE7623;--accent-dk:#c9621c;
   --glass:rgba(8,8,12,0.58);
-  --glass2:rgba(255,255,255,0.05);
-  --glass3:rgba(255,255,255,0.08);
   --border:rgba(255,255,255,0.08);
   --border2:rgba(255,255,255,0.13);
   --text:#f0f0f0;
@@ -25,39 +23,23 @@
 }
 html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',system-ui,sans-serif;color:var(--text)}
 
-/* BACKGROUND */
 #bg{position:fixed;inset:0;z-index:0;background:linear-gradient(135deg,#0d1b2a 0%,#1b2838 45%,#0f2027 100%);transition:background .6s}
 #bg-img{position:fixed;inset:0;z-index:1;background-size:cover;background-position:center;opacity:0;transition:opacity .6s}
 #bg-overlay{position:fixed;inset:0;z-index:2;background:rgba(0,0,0,.35);transition:background .4s}
-
 .page{position:relative;z-index:3;width:100vw;height:100vh;display:grid;grid-template-columns:215px 1fr 215px}
 
 /* SIDEBAR */
-.sidebar{
-  background:var(--glass);
-  backdrop-filter:blur(var(--blur));
-  -webkit-backdrop-filter:blur(var(--blur));
-  border-right:1px solid var(--border);
-  padding:16px 12px 12px;
-  display:flex;flex-direction:column;
-  overflow-y:auto;scrollbar-width:none
-}
+.sidebar{background:var(--glass);backdrop-filter:blur(var(--blur));-webkit-backdrop-filter:blur(var(--blur));border-right:1px solid var(--border);padding:16px 12px 12px;display:flex;flex-direction:column;overflow-y:auto;scrollbar-width:none}
 .sidebar::-webkit-scrollbar{display:none}
 .sidebar.right{border-right:none;border-left:1px solid var(--border)}
-
 .sb-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:0 3px}
 .logo{display:flex;align-items:center;gap:7px}
 .logo-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;box-shadow:0 0 10px var(--accent)}
 .logo-txt{font-size:10px;font-weight:700;color:var(--accent);letter-spacing:1.4px;text-transform:uppercase}
 .dot-live{width:6px;height:6px;border-radius:50%;background:var(--up);box-shadow:0 0 6px var(--up);animation:pulse 2.5s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
-
-.s-label{
-  font-size:9px;font-weight:700;letter-spacing:1.1px;color:var(--muted2);
-  text-transform:uppercase;margin:12px 0 5px 4px;
-  padding-bottom:5px;border-bottom:1px solid var(--border)
-}
-.s-row{display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border-radius:8px;cursor:default;transition:background .13s}
+.s-label{font-size:9px;font-weight:700;letter-spacing:1.1px;color:var(--muted2);text-transform:uppercase;margin:12px 0 5px 4px;padding-bottom:5px;border-bottom:1px solid var(--border)}
+.s-row{display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border-radius:8px;cursor:default;transition:background .13s;position:relative}
 .s-row:hover{background:rgba(255,255,255,0.05)}
 .s-name{font-size:11px;color:var(--muted);white-space:nowrap;flex-shrink:0}
 .s-right{text-align:right;min-width:78px}
@@ -66,129 +48,111 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',system-ui,s
 .up{color:var(--up)}.dn{color:var(--dn)}
 .ld{color:var(--muted2);animation:blink 1.2s infinite}
 @keyframes blink{0%,100%{opacity:.25}50%{opacity:.9}}
-
 .ref-btn{background:none;border:none;color:var(--muted);cursor:pointer;display:flex;align-items:center;padding:5px;border-radius:7px;transition:color .13s,background .13s}
 .ref-btn:hover{color:var(--accent);background:rgba(238,118,35,.1)}
 .spin{animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-
 .last-upd{margin-top:auto;padding-top:10px;border-top:1px solid var(--border);font-size:9px;color:var(--muted2);text-align:center;line-height:1.8}
 .last-upd span{color:var(--muted)}
-
-/* CENTER */
-.center{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;padding:32px 40px;position:relative}
-
-.clock{font-size:72px;font-weight:200;color:#fff;letter-spacing:-4px;line-height:1;font-variant-numeric:tabular-nums;text-align:center;text-shadow:0 2px 30px rgba(0,0,0,.45)}
-.datestr{font-size:13px;color:rgba(255,255,255,.5);margin-top:7px;letter-spacing:.5px;text-align:center}
-
-.search-wrap{width:100%;max-width:510px;position:relative}
-.search-input{
-  width:100%;
-  background:rgba(255,255,255,.08);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  border:1.5px solid rgba(255,255,255,.12);
-  border-radius:40px;padding:14px 58px 14px 24px;
-  font-size:14px;color:#fff;outline:none;
-  transition:border-color .2s,background .2s;font-family:inherit
-}
-.search-input:focus{border-color:var(--accent);background:rgba(255,255,255,.12)}
-.search-input::placeholder{color:rgba(255,255,255,.28)}
-.search-btn{
-  position:absolute;right:7px;top:50%;transform:translateY(-50%);
-  background:var(--accent);border:none;border-radius:50%;
-  width:38px;height:38px;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;color:#fff;font-size:17px;
-  transition:background .13s,transform .1s
-}
-.search-btn:hover{background:var(--accent-dk)}
-.search-btn:active{transform:translateY(-50%) scale(.93)}
-
-.favs-area{width:100%;max-width:600px;display:flex;flex-direction:column;align-items:center;gap:12px}
-.favs-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
-.fav-item{
-  position:relative;display:flex;flex-direction:column;align-items:center;gap:5px;
-  cursor:pointer;padding:12px 16px 10px;border-radius:12px;
-  border:1px solid rgba(255,255,255,.09);
-  background:rgba(255,255,255,.06);
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  transition:border-color .15s,background .13s,transform .15s;
-  text-decoration:none;user-select:none;min-width:72px
-}
-.fav-item:hover{border-color:var(--accent);background:rgba(255,255,255,.12);transform:translateY(-2px)}
-.fav-icon{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:17px;color:rgba(255,255,255,.45);transition:color .13s}
-.fav-item:hover .fav-icon{color:var(--accent)}
-.fav-name{font-size:10px;color:rgba(255,255,255,.4);white-space:nowrap;max-width:80px;overflow:hidden;text-overflow:ellipsis;text-align:center}
-.fav-del{display:none;position:absolute;top:4px;right:4px;font-size:10px;cursor:pointer;background:rgba(0,0,0,.5);border-radius:50%;width:16px;height:16px;align-items:center;justify-content:center;border:none;color:rgba(255,255,255,.7)}
-.fav-item:hover .fav-del{display:flex}
-.fav-del:hover{color:var(--dn)}
-
-.stock-row{position:relative}
-.stock-del{display:none;position:absolute;right:-2px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted2);cursor:pointer;padding:2px 4px;border-radius:4px;font-size:11px;line-height:1;transition:color .12s}
+.stock-del{display:none;position:absolute;right:0;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted2);cursor:pointer;padding:2px 5px;border-radius:4px;font-size:11px;line-height:1;transition:color .12s}
 .s-row:hover .stock-del{display:block}
 .stock-del:hover{color:var(--dn)}
 
-.add-btn{
-  display:flex;align-items:center;gap:7px;cursor:pointer;
-  padding:8px 18px;border-radius:20px;
-  border:1px dashed rgba(255,255,255,.14);
-  background:transparent;color:rgba(255,255,255,.3);
-  font-size:11px;font-family:inherit;
-  transition:border-color .15s,color .15s,background .15s
-}
+/* CENTER */
+.center{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:20px 36px;position:relative;overflow-y:auto;scrollbar-width:none}
+.center::-webkit-scrollbar{display:none}
+.clock{font-size:68px;font-weight:200;color:#fff;letter-spacing:-3px;line-height:1;font-variant-numeric:tabular-nums;text-align:center;text-shadow:0 2px 30px rgba(0,0,0,.45)}
+.datestr{font-size:13px;color:rgba(255,255,255,.5);margin-top:5px;letter-spacing:.5px;text-align:center}
+
+/* WEATHER */
+.weather-line{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;font-size:13px;color:rgba(255,255,255,.6);cursor:pointer}
+.weather-line:hover{color:rgba(255,255,255,.85)}
+.weather-icon{font-size:16px;line-height:1}
+.weather-temp{font-weight:500;color:rgba(255,255,255,.85)}
+.weather-city{font-size:11px;color:rgba(255,255,255,.4)}
+.weather-extra{font-size:10.5px;color:rgba(255,255,255,.35)}
+
+/* WORLD CLOCKS */
+.world-clocks{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.wc-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 12px;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);min-width:64px}
+.wc-city{font-size:9px;color:var(--muted2);letter-spacing:.6px;text-transform:uppercase}
+.wc-time{font-size:14px;font-weight:300;color:rgba(255,255,255,.75);font-variant-numeric:tabular-nums}
+
+/* SEARCH */
+.search-wrap{width:100%;max-width:510px;position:relative}
+.search-input{width:100%;background:rgba(255,255,255,.08);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1.5px solid rgba(255,255,255,.12);border-radius:40px;padding:13px 56px 13px 24px;font-size:14px;color:#fff;outline:none;transition:border-color .2s,background .2s;font-family:inherit}
+.search-input:focus{border-color:var(--accent);background:rgba(255,255,255,.12)}
+.search-input::placeholder{color:rgba(255,255,255,.28)}
+.search-btn{position:absolute;right:7px;top:50%;transform:translateY(-50%);background:var(--accent);border:none;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;font-size:17px;transition:background .13s}
+.search-btn:hover{background:var(--accent-dk)}
+.search-btn:active{transform:translateY(-50%) scale(.93)}
+
+/* FAVS */
+.favs-area{width:100%;max-width:600px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.favs-grid{display:flex;flex-wrap:wrap;gap:9px;justify-content:center}
+.fav-item{position:relative;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:11px 15px 9px;border-radius:12px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.06);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transition:border-color .15s,background .13s,transform .15s;text-decoration:none;user-select:none;min-width:70px}
+.fav-item:hover{border-color:var(--accent);background:rgba(255,255,255,.12);transform:translateY(-2px)}
+.fav-icon{width:30px;height:30px;border-radius:7px;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:16px;color:rgba(255,255,255,.45);transition:color .13s;overflow:hidden}
+.fav-icon img{width:20px;height:20px;border-radius:3px;object-fit:contain}
+.fav-item:hover .fav-icon{color:var(--accent)}
+.fav-name{font-size:10px;color:rgba(255,255,255,.4);white-space:nowrap;max-width:78px;overflow:hidden;text-overflow:ellipsis;text-align:center}
+.fav-del{display:none;position:absolute;top:4px;right:4px;font-size:10px;cursor:pointer;background:rgba(0,0,0,.5);border-radius:50%;width:16px;height:16px;align-items:center;justify-content:center;border:none;color:rgba(255,255,255,.7)}
+.fav-item:hover .fav-del{display:flex}
+.fav-del:hover{color:var(--dn)}
+.add-btn{display:flex;align-items:center;gap:7px;cursor:pointer;padding:7px 16px;border-radius:20px;border:1px dashed rgba(255,255,255,.14);background:transparent;color:rgba(255,255,255,.3);font-size:11px;font-family:inherit;transition:border-color .15s,color .15s,background .15s}
 .add-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(238,118,35,.08)}
 
-.settings-btn{
-  position:absolute;bottom:20px;right:20px;
-  background:rgba(255,255,255,.06);
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  border:1px solid rgba(255,255,255,.1);border-radius:50%;
-  width:36px;height:36px;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;color:rgba(255,255,255,.35);font-size:16px;
-  transition:color .15s,background .15s,border-color .15s
-}
+/* TODO */
+.todo-widget{width:100%;max-width:480px;background:rgba(255,255,255,.05);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden}
+.todo-hd{display:flex;align-items:center;gap:8px;padding:10px 14px;cursor:pointer;user-select:none;border-bottom:1px solid transparent;transition:background .13s}
+.todo-hd:hover{background:rgba(255,255,255,.04)}
+.todo-hd.open{border-bottom-color:rgba(255,255,255,.07)}
+.todo-hd-label{font-size:10px;font-weight:600;letter-spacing:.9px;text-transform:uppercase;color:var(--muted2);flex:1}
+.todo-badge{font-size:9px;background:var(--accent);color:#fff;border-radius:10px;padding:1px 6px;font-weight:600;display:none}
+.todo-badge.show{display:inline}
+.todo-chevron{font-size:12px;color:var(--muted2);transition:transform .2s}
+.todo-chevron.open{transform:rotate(180deg)}
+.todo-body{display:none;padding:8px 0 10px}
+.todo-body.open{display:block}
+.todo-list{max-height:160px;overflow-y:auto;scrollbar-width:none}
+.todo-list::-webkit-scrollbar{display:none}
+.todo-item{display:flex;align-items:center;gap:9px;padding:6px 14px;group:hover}
+.todo-item:hover{background:rgba(255,255,255,.03)}
+.todo-cb{width:15px;height:15px;border-radius:4px;border:1.5px solid rgba(255,255,255,.2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .13s,background .13s}
+.todo-cb.done{background:var(--accent);border-color:var(--accent)}
+.todo-cb.done::after{content:'✓';font-size:9px;color:#fff}
+.todo-text{flex:1;font-size:12px;color:rgba(255,255,255,.7);cursor:pointer;transition:color .13s}
+.todo-text.done{text-decoration:line-through;color:rgba(255,255,255,.3)}
+.todo-rm{background:none;border:none;color:var(--muted2);cursor:pointer;font-size:11px;padding:2px 4px;border-radius:4px;opacity:0;transition:opacity .13s,color .13s}
+.todo-item:hover .todo-rm{opacity:1}
+.todo-rm:hover{color:var(--dn)}
+.todo-add-row{display:flex;align-items:center;gap:6px;padding:6px 14px 0;border-top:1px solid rgba(255,255,255,.06);margin-top:4px}
+.todo-input{flex:1;background:transparent;border:none;outline:none;font-size:12px;color:rgba(255,255,255,.7);font-family:inherit}
+.todo-input::placeholder{color:rgba(255,255,255,.2)}
+.todo-add-btn{background:none;border:none;color:var(--muted2);cursor:pointer;font-size:14px;padding:2px;transition:color .13s}
+.todo-add-btn:hover{color:var(--accent)}
+
+/* SETTINGS BTN */
+.settings-btn{position:absolute;bottom:16px;right:16px;background:rgba(255,255,255,.06);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,.35);font-size:15px;transition:color .15s,background .15s,border-color .15s}
 .settings-btn:hover{color:var(--accent);border-color:var(--accent);background:rgba(238,118,35,.1)}
 
 /* MODALS */
-.modal-bg{
-  display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,.6);
-  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  align-items:center;justify-content:center;z-index:200
-}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;z-index:200}
 .modal-bg.open{display:flex}
-.modal{
-  background:rgba(14,14,18,.94);
-  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-  border:1px solid rgba(255,255,255,.1);border-radius:16px;
-  padding:26px;width:300px;
-  box-shadow:0 24px 64px rgba(0,0,0,.55)
-}
+.modal{background:rgba(14,14,18,.94);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:26px;width:310px;box-shadow:0 24px 64px rgba(0,0,0,.55)}
 .modal h3{font-size:14px;font-weight:600;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:8px}
-.modal input{
-  width:100%;background:rgba(255,255,255,.07);
-  border:1px solid rgba(255,255,255,.12);border-radius:10px;
-  padding:10px 14px;font-size:12px;color:var(--text);
-  outline:none;margin-bottom:10px;font-family:inherit;
-  transition:border-color .15s
-}
+.modal input{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--text);outline:none;margin-bottom:10px;font-family:inherit;transition:border-color .15s}
 .modal input:focus{border-color:var(--accent)}
 .modal input::placeholder{color:var(--muted2)}
+.modal-note{font-size:10px;color:var(--muted2);line-height:1.6;margin:-4px 0 12px}
 .modal-actions{display:flex;gap:8px;margin-top:6px}
-.btn-cancel{
-  flex:1;background:transparent;border:1px solid rgba(255,255,255,.12);
-  border-radius:10px;padding:9px;font-size:12px;color:var(--muted);
-  cursor:pointer;font-family:inherit;transition:border-color .13s
-}
+.btn-cancel{flex:1;background:transparent;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:9px;font-size:12px;color:var(--muted);cursor:pointer;font-family:inherit;transition:border-color .13s}
 .btn-cancel:hover{border-color:rgba(255,255,255,.25)}
-.btn-save{
-  flex:1;background:var(--accent);border:none;border-radius:10px;
-  padding:9px;font-size:12px;color:#fff;cursor:pointer;
-  font-weight:600;font-family:inherit;transition:background .13s
-}
+.btn-save{flex:1;background:var(--accent);border:none;border-radius:10px;padding:9px;font-size:12px;color:#fff;cursor:pointer;font-weight:600;font-family:inherit;transition:background .13s}
 .btn-save:hover{background:var(--accent-dk)}
 
 /* SETTINGS MODAL */
-.settings-modal{width:380px}
+.settings-modal{width:390px}
 .s-sec{margin-bottom:18px}
 .s-sec-title{font-size:9.5px;font-weight:700;letter-spacing:1px;color:var(--muted2);text-transform:uppercase;margin-bottom:10px}
 .bg-presets{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:12px}
@@ -197,37 +161,30 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',system-ui,s
 .bg-preset.active{border-color:var(--accent)}
 .bg-url-row{display:flex;gap:7px}
 .bg-url-row input{flex:1;margin-bottom:0}
-.bg-url-btn{
-  background:var(--accent);border:none;border-radius:10px;
-  padding:0 14px;color:#fff;cursor:pointer;font-size:12px;
-  font-family:inherit;white-space:nowrap;transition:background .13s
-}
+.bg-url-btn{background:var(--accent);border:none;border-radius:10px;padding:0 14px;color:#fff;cursor:pointer;font-size:12px;font-family:inherit;white-space:nowrap;transition:background .13s}
 .bg-url-btn:hover{background:var(--accent-dk)}
 .dim-row{display:flex;align-items:center;gap:10px;margin-top:12px}
 .dim-lbl{font-size:11px;color:var(--muted);white-space:nowrap;min-width:56px}
 .dim-slider{flex:1;-webkit-appearance:none;appearance:none;height:4px;border-radius:2px;background:rgba(255,255,255,.15);outline:none;cursor:pointer}
-.dim-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 0 6px rgba(238,118,35,.5)}
+.dim-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer}
 .dim-val{font-size:11px;color:var(--muted);min-width:34px;text-align:right}
-
 .se-row{display:flex;gap:7px}
-.se-btn{
-  flex:1;padding:8px 4px;border-radius:9px;
-  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
-  color:var(--muted);font-size:11px;cursor:pointer;font-family:inherit;
-  transition:all .13s;text-align:center
-}
+.se-btn{flex:1;padding:8px 4px;border-radius:9px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--muted);font-size:11px;cursor:pointer;font-family:inherit;transition:all .13s;text-align:center}
 .se-btn.active,.se-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(238,118,35,.08)}
+/* world clock settings */
+.wc-list{display:flex;flex-direction:column;gap:5px;margin-bottom:8px;max-height:120px;overflow-y:auto;scrollbar-width:none}
+.wc-list::-webkit-scrollbar{display:none}
+.wc-list-item{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07)}
+.wc-list-item span{flex:1;font-size:11px;color:var(--muted)}
+.wc-list-item button{background:none;border:none;color:var(--muted2);cursor:pointer;font-size:11px;padding:2px;transition:color .12s}
+.wc-list-item button:hover{color:var(--dn)}
+.wc-add-row{display:flex;gap:6px}
+.wc-add-row input{flex:1;margin-bottom:0}
+.wc-add-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:0 12px;color:var(--muted);cursor:pointer;font-size:12px;font-family:inherit;white-space:nowrap;transition:all .13s}
+.wc-add-btn:hover{border-color:var(--accent);color:var(--accent)}
 
 /* TOAST */
-.toast{
-  position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
-  font-size:11px;color:rgba(255,255,255,.7);
-  background:rgba(14,14,18,.88);
-  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  border:1px solid rgba(255,255,255,.1);border-radius:24px;
-  padding:7px 20px;pointer-events:none;opacity:0;transition:opacity .3s;
-  white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.35)
-}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);font-size:11px;color:rgba(255,255,255,.7);background:rgba(14,14,18,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:7px 20px;pointer-events:none;opacity:0;transition:opacity .3s;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.35)}
 .toast.show{opacity:1}
 </style>
 </head>
@@ -266,15 +223,39 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',system-ui,s
   <div style="text-align:center">
     <div class="clock" id="clock">00:00</div>
     <div class="datestr" id="datestr">—</div>
+    <div class="weather-line" id="weather-line" title="Konumu güncelle">
+      <span class="ld">···</span>
+    </div>
   </div>
+
+  <div class="world-clocks" id="world-clocks"></div>
+
   <div class="search-wrap">
     <input class="search-input" id="q" type="text" placeholder="Ara..." autocomplete="off" spellcheck="false">
     <button class="search-btn" id="search-btn" aria-label="Ara"><i class="ti ti-search"></i></button>
   </div>
+
   <div class="favs-area">
     <div class="favs-grid" id="favs-grid"></div>
     <button class="add-btn" id="add-btn"><i class="ti ti-plus" style="font-size:13px"></i>site ekle</button>
   </div>
+
+  <div class="todo-widget">
+    <div class="todo-hd" id="todo-hd">
+      <i class="ti ti-check" style="font-size:13px;color:var(--muted2)"></i>
+      <span class="todo-hd-label">yapılacaklar</span>
+      <span class="todo-badge" id="todo-badge"></span>
+      <i class="ti ti-chevron-down todo-chevron" id="todo-chevron"></i>
+    </div>
+    <div class="todo-body" id="todo-body">
+      <div class="todo-list" id="todo-list"></div>
+      <div class="todo-add-row">
+        <input class="todo-input" id="todo-input" type="text" placeholder="yeni görev ekle...">
+        <button class="todo-add-btn" id="todo-add-btn"><i class="ti ti-plus"></i></button>
+      </div>
+    </div>
+  </div>
+
   <button class="settings-btn" id="settings-btn" aria-label="Ayarlar"><i class="ti ti-settings"></i></button>
 </div>
 
@@ -310,11 +291,8 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',system-ui,s
   <div class="modal">
     <h3><i class="ti ti-chart-line" style="color:var(--accent)"></i>hisse ekle</h3>
     <input id="sm-sym"  type="text" placeholder="Sembol  (ör: AAPL, THYAO.IS, ^DJI)">
-    <input id="sm-name" type="text" placeholder="Görünen ad  (ör: Apple — boş bırakılabilir)">
-    <p style="font-size:10px;color:var(--muted2);margin:-4px 0 10px;line-height:1.6">
-      BIST: <b>THYAO.IS</b> &nbsp;·&nbsp; ABD: <b>AAPL</b> &nbsp;·&nbsp; Endeks: <b>^GSPC ^NDX ^GDAXI</b><br>
-      Petrol: <b>CL=F</b> &nbsp;·&nbsp; Kripto: <b>BTC-USD</b>
-    </p>
+    <input id="sm-name" type="text" placeholder="Görünen ad  (boş bırakılabilir)">
+    <p class="modal-note">BIST: <b>THYAO.IS</b> · ABD: <b>AAPL</b> · Endeks: <b>^GSPC ^NDX</b><br>Petrol: <b>CL=F</b></p>
     <div class="modal-actions">
       <button class="btn-cancel" id="stock-modal-cancel">iptal</button>
       <button class="btn-save"   id="stock-modal-save">ekle</button>
@@ -331,13 +309,23 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',system-ui,s
       <div class="s-sec-title">Arka Plan</div>
       <div class="bg-presets" id="bg-presets"></div>
       <div class="bg-url-row">
-        <input id="bg-url-input" type="text" placeholder="Resim URL'si girin...">
+        <input id="bg-url-input" type="text" placeholder="Resim URL'si...">
         <button class="bg-url-btn" id="bg-url-apply">Uygula</button>
       </div>
       <div class="dim-row">
         <span class="dim-lbl">Karartma</span>
         <input type="range" class="dim-slider" id="dim-slider" min="0" max="80" step="5" value="35">
         <span class="dim-val" id="dim-val">%35</span>
+      </div>
+    </div>
+
+    <div class="s-sec">
+      <div class="s-sec-title">Dünya Saatleri</div>
+      <div class="wc-list" id="wc-list"></div>
+      <div class="wc-add-row">
+        <input id="wc-city-input" type="text" placeholder="Şehir adı (ör: Tokyo)">
+        <input id="wc-tz-input"   type="text" placeholder="Timezone (ör: Asia/Tokyo)">
+        <button class="wc-add-btn" id="wc-add-btn">Ekle</button>
       </div>
     </div>
 
@@ -362,29 +350,11 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',system-ui,s
 const $=id=>document.getElementById(id);
 const pad=n=>String(n).padStart(2,'0');
 
-function fmt(n,d=2){
-  if(n==null||isNaN(n)) return null;
-  return Number(n).toLocaleString('tr-TR',{minimumFractionDigits:d,maximumFractionDigits:d});
-}
-function fmtK(n){
-  if(n==null||isNaN(n)) return null;
-  if(n>=1e6) return fmt(n/1e6,2)+'M';
-  if(n>=1e3) return fmt(n/1e3,1)+'K';
-  return fmt(n,0);
-}
-function setVal(id,val){
-  const el=$(id); if(!el) return;
-  el.innerHTML=(val!=null)?String(val):'<span class="ld">···</span>';
-}
-function setChg(id,pct){
-  const el=$(id); if(!el||pct==null) return;
-  const v=Number(pct),cls=v>0?'up':v<0?'dn':'',sign=v>0?'+':'';
-  el.innerHTML=`<span class="${cls}">${sign}${fmt(v,2)}%</span>`;
-}
-function toast(msg,dur=2200){
-  const el=$('toast'); el.textContent=msg; el.classList.add('show');
-  clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('show'),dur);
-}
+function fmt(n,d=2){if(n==null||isNaN(n))return null;return Number(n).toLocaleString('tr-TR',{minimumFractionDigits:d,maximumFractionDigits:d});}
+function fmtK(n){if(n==null||isNaN(n))return null;if(n>=1e6)return fmt(n/1e6,2)+'M';if(n>=1e3)return fmt(n/1e3,1)+'K';return fmt(n,0);}
+function setVal(id,val){const el=$(id);if(!el)return;el.innerHTML=(val!=null)?String(val):'<span class="ld">···</span>';}
+function setChg(id,pct){const el=$(id);if(!el||pct==null)return;const v=Number(pct),cls=v>0?'up':v<0?'dn':'',sign=v>0?'+':'';el.innerHTML=`<span class="${cls}">${sign}${fmt(v,2)}%</span>`;}
+function toast(msg,dur=2200){const el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),dur);}
 
 /* ── CLOCK ── */
 const DAYS=['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
@@ -393,169 +363,196 @@ function tick(){
   const n=new Date();
   $('clock').textContent=pad(n.getHours())+':'+pad(n.getMinutes());
   $('datestr').textContent=DAYS[n.getDay()]+', '+n.getDate()+' '+MONTHS[n.getMonth()]+' '+n.getFullYear();
+  tickWorldClocks();
 }
-setInterval(tick,1000); tick();
+setInterval(tick,1000);tick();
 
-/* ── BACKGROUND & SETTINGS ── */
+/* ── SETTINGS & BACKGROUND ── */
 const BG_PRESETS=[
   {label:'Gece Mavisi',css:'linear-gradient(135deg,#0d1b2a 0%,#1b2838 45%,#0f2027 100%)'},
-  {label:'Okyanus',  css:'linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%)'},
-  {label:'Evren',   css:'linear-gradient(135deg,#1a0533 0%,#2d1b69 50%,#11054d 100%)'},
-  {label:'Safir',   css:'linear-gradient(135deg,#1a1a2e 0%,#16213e 40%,#0f3460 100%)'},
-  {label:'Oniks',   css:'linear-gradient(135deg,#0a0a0a 0%,#181818 50%,#0d0d0d 100%)'},
-  {label:'Demir',   css:'linear-gradient(135deg,#1c1c1e 0%,#2c2c2e 50%,#1c1c1e 100%)'},
-  {label:'Orman',   css:'linear-gradient(135deg,#0a1a0a 0%,#0d2b17 50%,#061410 100%)'},
-  {label:'Şarap',   css:'linear-gradient(135deg,#1a0505 0%,#2d0909 50%,#1a0800 100%)'},
+  {label:'Okyanus',    css:'linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%)'},
+  {label:'Evren',      css:'linear-gradient(135deg,#1a0533 0%,#2d1b69 50%,#11054d 100%)'},
+  {label:'Safir',      css:'linear-gradient(135deg,#1a1a2e 0%,#16213e 40%,#0f3460 100%)'},
+  {label:'Oniks',      css:'linear-gradient(135deg,#0a0a0a 0%,#181818 50%,#0d0d0d 100%)'},
+  {label:'Demir',      css:'linear-gradient(135deg,#1c1c1e 0%,#2c2c2e 50%,#1c1c1e 100%)'},
+  {label:'Orman',      css:'linear-gradient(135deg,#0a1a0a 0%,#0d2b17 50%,#061410 100%)'},
+  {label:'Şarap',      css:'linear-gradient(135deg,#1a0505 0%,#2d0909 50%,#1a0800 100%)'},
 ];
 
 let cfg={
-  bgType:'gradient',
-  bgGradient:BG_PRESETS[0].css,
-  bgImage:'',
-  dim:35,
-  searchUrl:'https://www.google.com/search?q='
+  bgType:'gradient',bgGradient:BG_PRESETS[0].css,bgImage:'',dim:35,
+  searchUrl:'https://www.google.com/search?q=',
+  worldClocks:[
+    {city:'İstanbul',tz:'Europe/Istanbul'},
+    {city:'Londra',  tz:'Europe/London'},
+    {city:'New York',tz:'America/New_York'},
+    {city:'Tokyo',   tz:'Asia/Tokyo'},
+  ],
+  weatherLat:41.01,weatherLon:28.97,weatherCity:'İstanbul',
 };
-try{const s=localStorage.getItem('sp_cfg_v1');if(s)Object.assign(cfg,JSON.parse(s));}catch{}
-
-function saveCfg(){try{localStorage.setItem('sp_cfg_v1',JSON.stringify(cfg));}catch{}}
+try{const s=localStorage.getItem('sp_cfg_v2');if(s)Object.assign(cfg,JSON.parse(s));}catch{}
+function saveCfg(){try{localStorage.setItem('sp_cfg_v2',JSON.stringify(cfg));}catch{}}
 
 function applyBg(){
-  const bgEl=$('bg'), imgEl=$('bg-img'), ovEl=$('bg-overlay');
-  if(cfg.bgType==='image'&&cfg.bgImage){
-    bgEl.style.background='#000';
-    imgEl.style.backgroundImage=`url(${cfg.bgImage})`;
-    imgEl.style.opacity='1';
-  } else {
-    bgEl.style.background=cfg.bgGradient;
-    imgEl.style.opacity='0';
-    imgEl.style.backgroundImage='none';
-  }
+  const bgEl=$('bg'),imgEl=$('bg-img'),ovEl=$('bg-overlay');
+  if(cfg.bgType==='image'&&cfg.bgImage){bgEl.style.background='#000';imgEl.style.backgroundImage=`url(${cfg.bgImage})`;imgEl.style.opacity='1';}
+  else{bgEl.style.background=cfg.bgGradient;imgEl.style.opacity='0';imgEl.style.backgroundImage='none';}
   ovEl.style.background=`rgba(0,0,0,${cfg.dim/100})`;
 }
 applyBg();
 
-/* build preset swatches */
-BG_PRESETS.forEach((p,i)=>{
+BG_PRESETS.forEach(p=>{
   const el=document.createElement('div');
   el.className='bg-preset'+(cfg.bgType==='gradient'&&cfg.bgGradient===p.css?' active':'');
-  el.style.background=p.css;
-  el.title=p.label;
-  el.addEventListener('click',()=>{
-    cfg.bgType='gradient'; cfg.bgGradient=p.css;
-    applyBg(); saveCfg();
-    document.querySelectorAll('.bg-preset').forEach(b=>b.classList.remove('active'));
-    el.classList.add('active');
-    $('bg-url-input').value='';
-  });
+  el.style.background=p.css;el.title=p.label;
+  el.addEventListener('click',()=>{cfg.bgType='gradient';cfg.bgGradient=p.css;applyBg();saveCfg();document.querySelectorAll('.bg-preset').forEach(b=>b.classList.remove('active'));el.classList.add('active');$('bg-url-input').value='';});
   $('bg-presets').appendChild(el);
 });
 
-/* dim slider */
-const dimSlider=$('dim-slider'), dimValEl=$('dim-val');
-dimSlider.value=cfg.dim;
-dimValEl.textContent='%'+cfg.dim;
-dimSlider.addEventListener('input',()=>{
-  cfg.dim=Number(dimSlider.value);
-  dimValEl.textContent='%'+cfg.dim;
-  applyBg(); saveCfg();
-});
+const dimSlider=$('dim-slider'),dimValEl=$('dim-val');
+dimSlider.value=cfg.dim;dimValEl.textContent='%'+cfg.dim;
+dimSlider.addEventListener('input',()=>{cfg.dim=Number(dimSlider.value);dimValEl.textContent='%'+cfg.dim;applyBg();saveCfg();});
 
-/* custom image URL */
-$('bg-url-apply').addEventListener('click',()=>{
-  const url=$('bg-url-input').value.trim();
-  if(!url){toast('URL giriniz');return;}
-  cfg.bgType='image'; cfg.bgImage=url;
-  applyBg(); saveCfg();
-  document.querySelectorAll('.bg-preset').forEach(b=>b.classList.remove('active'));
-  toast('arka plan güncellendi ✓');
-});
+$('bg-url-apply').addEventListener('click',()=>{const url=$('bg-url-input').value.trim();if(!url){toast('URL giriniz');return;}cfg.bgType='image';cfg.bgImage=url;applyBg();saveCfg();document.querySelectorAll('.bg-preset').forEach(b=>b.classList.remove('active'));toast('arka plan güncellendi ✓');});
 $('bg-url-input').addEventListener('keydown',e=>{if(e.key==='Enter')$('bg-url-apply').click();});
 
-/* search engine buttons */
 const seButtons=document.querySelectorAll('.se-btn');
 function updateSeUI(){seButtons.forEach(b=>b.classList.toggle('active',b.dataset.url===cfg.searchUrl));}
 updateSeUI();
-seButtons.forEach(b=>{
-  b.addEventListener('click',()=>{cfg.searchUrl=b.dataset.url;saveCfg();updateSeUI();});
-});
+seButtons.forEach(b=>{b.addEventListener('click',()=>{cfg.searchUrl=b.dataset.url;saveCfg();updateSeUI();});});
 
-/* open/close settings */
-$('settings-btn').addEventListener('click',()=>{
-  $('bg-url-input').value=cfg.bgType==='image'?cfg.bgImage:'';
-  $('settings-bg').classList.add('open');
-});
+$('settings-btn').addEventListener('click',()=>{$('bg-url-input').value=cfg.bgType==='image'?cfg.bgImage:'';renderWcList();$('settings-bg').classList.add('open');});
 $('settings-close').addEventListener('click',()=>$('settings-bg').classList.remove('open'));
 $('settings-bg').addEventListener('click',e=>{if(e.target===$('settings-bg'))$('settings-bg').classList.remove('open');});
 
-/* ── SEARCH ── */
-function doSearch(){
-  const q=$('q').value.trim(); if(!q) return;
-  location.href=cfg.searchUrl+encodeURIComponent(q);
+/* ── WORLD CLOCKS ── */
+function tickWorldClocks(){
+  const container=$('world-clocks');
+  if(!container.children.length) renderWorldClocks();
+  const now=new Date();
+  container.querySelectorAll('.wc-item').forEach(el=>{
+    const tz=el.dataset.tz;
+    try{el.querySelector('.wc-time').textContent=now.toLocaleTimeString('tr-TR',{timeZone:tz,hour:'2-digit',minute:'2-digit'});}catch{}
+  });
 }
+function renderWorldClocks(){
+  const c=$('world-clocks');
+  c.innerHTML=cfg.worldClocks.map(w=>`<div class="wc-item" data-tz="${w.tz}"><div class="wc-city">${w.city}</div><div class="wc-time">--:--</div></div>`).join('');
+}
+renderWorldClocks();
+
+function renderWcList(){
+  const list=$('wc-list');
+  list.innerHTML=cfg.worldClocks.map((w,i)=>`
+    <div class="wc-list-item">
+      <span>${w.city} <small style="opacity:.5">${w.tz}</small></span>
+      <button onclick="removeWc(${i})"><i class="ti ti-x"></i></button>
+    </div>`).join('');
+}
+window.removeWc=function(i){cfg.worldClocks.splice(i,1);saveCfg();renderWorldClocks();renderWcList();};
+$('wc-add-btn').addEventListener('click',()=>{
+  const city=$('wc-city-input').value.trim();
+  const tz=$('wc-tz-input').value.trim();
+  if(!city||!tz){toast('Şehir adı ve timezone giriniz');return;}
+  try{new Date().toLocaleTimeString('tr-TR',{timeZone:tz});}catch{toast('Geçersiz timezone');return;}
+  cfg.worldClocks.push({city,tz});
+  saveCfg();renderWorldClocks();renderWcList();
+  $('wc-city-input').value='';$('wc-tz-input').value='';
+  toast(city+' eklendi ✓');
+});
+
+/* ── WEATHER ── */
+const WMO={
+  0:{i:'☀️',d:'Açık'},1:{i:'🌤',d:'Az bulutlu'},2:{i:'⛅',d:'Parçalı bulutlu'},3:{i:'☁️',d:'Bulutlu'},
+  45:{i:'🌫',d:'Sis'},48:{i:'🌫',d:'Kırağılı sis'},
+  51:{i:'🌦',d:'Hafif çisenti'},53:{i:'🌦',d:'Çisenti'},55:{i:'🌦',d:'Yoğun çisenti'},
+  61:{i:'🌧',d:'Hafif yağmur'},63:{i:'🌧',d:'Yağmur'},65:{i:'🌧',d:'Yoğun yağmur'},
+  71:{i:'🌨',d:'Hafif kar'},73:{i:'🌨',d:'Kar'},75:{i:'❄️',d:'Yoğun kar'},
+  80:{i:'🌦',d:'Sağanak'},81:{i:'🌧',d:'Kuvvetli sağanak'},82:{i:'⛈',d:'Şiddetli sağanak'},
+  95:{i:'⛈',d:'Fırtına'},96:{i:'⛈',d:'Dolu ile fırtına'},99:{i:'⛈',d:'Şiddetli fırtına'},
+};
+async function fetchWeather(lat,lon){
+  try{
+    const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code&timezone=auto&wind_speed_unit=ms`,{signal:AbortSignal.timeout(8000)});
+    if(!r.ok)return;
+    const data=await r.json();
+    const c=data.current;
+    const wmo=WMO[c.weather_code]||{i:'🌡',d:''};
+    const temp=Math.round(c.temperature_2m);
+    const feel=Math.round(c.apparent_temperature);
+    const hum=c.relative_humidity_2m;
+    $('weather-line').innerHTML=`
+      <span class="weather-icon">${wmo.i}</span>
+      <span class="weather-temp">${temp}°C</span>
+      <span class="weather-extra">${wmo.d} · Hissedilen ${feel}°C · Nem %${hum}</span>
+      <span class="weather-city">${cfg.weatherCity}</span>`;
+  }catch(e){console.warn('Weather:',e);}
+}
+function initWeather(){
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(pos=>{
+      cfg.weatherLat=pos.coords.latitude;
+      cfg.weatherLon=pos.coords.longitude;
+      /* reverse geocode city name via Open-Meteo geocoding */
+      fetch(`https://geocoding-api.open-meteo.com/v1/search?name=city&count=1&latitude=${cfg.weatherLat}&longitude=${cfg.weatherLon}`)
+        .then(()=>{}).catch(()=>{});
+      saveCfg();
+      fetchWeather(cfg.weatherLat,cfg.weatherLon);
+    },()=>fetchWeather(cfg.weatherLat,cfg.weatherLon));
+  } else {
+    fetchWeather(cfg.weatherLat,cfg.weatherLon);
+  }
+}
+$('weather-line').addEventListener('click',()=>{
+  initWeather();
+  toast('konum yenileniyor...');
+});
+initWeather();
+setInterval(()=>fetchWeather(cfg.weatherLat,cfg.weatherLon),10*60*1000);
+
+/* ── SEARCH ── */
+function doSearch(){const q=$('q').value.trim();if(!q)return;location.href=cfg.searchUrl+encodeURIComponent(q);}
 $('q').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
 $('search-btn').addEventListener('click',doSearch);
 
 /* ── FAVS ── */
 const FAVS_KEY='sp_favs_v4';
 const DEF=[
-  {name:'Google',  url:'https://google.com',      icon:'ti-brand-google'},
-  {name:'Gmail',   url:'https://mail.google.com', icon:'ti-mail'},
-  {name:'YouTube', url:'https://youtube.com',     icon:'ti-brand-youtube'},
-  {name:'GitHub',  url:'https://github.com',      icon:'ti-brand-github'},
-  {name:'X',       url:'https://x.com',           icon:'ti-brand-x'},
-  {name:'LinkedIn',url:'https://linkedin.com',    icon:'ti-brand-linkedin'},
+  {name:'Google',  url:'https://google.com'},
+  {name:'Gmail',   url:'https://mail.google.com'},
+  {name:'YouTube', url:'https://youtube.com'},
+  {name:'GitHub',  url:'https://github.com'},
+  {name:'X',       url:'https://x.com'},
+  {name:'LinkedIn',url:'https://linkedin.com'},
 ];
 let favs=[];
 try{const s=localStorage.getItem(FAVS_KEY);favs=s?JSON.parse(s):[...DEF];}catch{favs=[...DEF];}
-
-const iconGuess=url=>{
-  const u=url.toLowerCase();
-  if(u.includes('mail.google'))  return 'ti-mail';
-  if(u.includes('drive.google')) return 'ti-brand-google-drive';
-  if(u.includes('google'))       return 'ti-brand-google';
-  if(u.includes('youtube'))      return 'ti-brand-youtube';
-  if(u.includes('github'))       return 'ti-brand-github';
-  if(u.includes('twitter')||u.includes('x.com')) return 'ti-brand-x';
-  if(u.includes('linkedin'))     return 'ti-brand-linkedin';
-  if(u.includes('reddit'))       return 'ti-brand-reddit';
-  if(u.includes('notion'))       return 'ti-brand-notion';
-  if(u.includes('slack'))        return 'ti-brand-slack';
-  if(u.includes('figma'))        return 'ti-brand-figma';
-  if(u.includes('spotify'))      return 'ti-brand-spotify';
-  if(u.includes('instagram'))    return 'ti-brand-instagram';
-  if(u.includes('facebook'))     return 'ti-brand-facebook';
-  if(u.includes('whatsapp'))     return 'ti-brand-whatsapp';
-  if(u.includes('discord'))      return 'ti-brand-discord';
-  if(u.includes('netflix'))      return 'ti-player-play';
-  if(u.includes('amazon'))       return 'ti-brand-amazon';
-  if(u.includes('dropbox'))      return 'ti-brand-dropbox';
-  if(u.includes('twitch'))       return 'ti-brand-twitch';
-  if(u.includes('tiktok'))       return 'ti-brand-tiktok';
-  if(u.includes('pinterest'))    return 'ti-brand-pinterest';
-  if(u.includes('telegram'))     return 'ti-brand-telegram';
-  return 'ti-world';
-};
 function saveFavsLS(){try{localStorage.setItem(FAVS_KEY,JSON.stringify(favs));}catch{}}
+
+function getFavicon(url){
+  try{const d=new URL(url.startsWith('http')?url:'https://'+url).hostname;return `https://www.google.com/s2/favicons?domain=${d}&sz=32`;}
+  catch{return null;}
+}
+
 function renderFavs(){
   const grid=$('favs-grid');
-  grid.innerHTML=favs.map((f,i)=>`
-    <div class="fav-item" data-url="${f.url}" data-i="${i}">
-      <div class="fav-icon"><i class="ti ${f.icon||'ti-world'}"></i></div>
+  grid.innerHTML=favs.map((f,i)=>{
+    const fv=getFavicon(f.url);
+    const iconHtml=fv
+      ? `<img src="${fv}" alt="" onerror="this.style.display='none';this.nextSibling.style.display='flex'">`
+      + `<i class="ti ti-world" style="display:none"></i>`
+      : `<i class="ti ti-world"></i>`;
+    return `<div class="fav-item" data-url="${f.url}" data-i="${i}">
+      <div class="fav-icon">${iconHtml}</div>
       <div class="fav-name">${f.name}</div>
       <button class="fav-del" data-i="${i}" title="Kaldır"><i class="ti ti-x"></i></button>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   grid.querySelectorAll('.fav-item').forEach(el=>{
-    el.addEventListener('click',e=>{
-      if(e.target.closest('.fav-del')) return;
-      location.href=el.dataset.url;
-    });
+    el.addEventListener('click',e=>{if(e.target.closest('.fav-del'))return;location.href=el.dataset.url;});
   });
   grid.querySelectorAll('.fav-del').forEach(btn=>{
-    btn.addEventListener('click',e=>{
-      e.stopPropagation();
-      favs.splice(Number(btn.dataset.i),1);
-      saveFavsLS(); renderFavs();
-    });
+    btn.addEventListener('click',e=>{e.stopPropagation();favs.splice(Number(btn.dataset.i),1);saveFavsLS();renderFavs();});
   });
 }
 renderFavs();
@@ -568,179 +565,156 @@ $('modal-save').addEventListener('click',saveFav);
 $('m-url').addEventListener('keydown',e=>{if(e.key==='Enter')saveFav();});
 function closeModal(){modalBg.classList.remove('open');$('m-name').value='';$('m-url').value='';}
 function saveFav(){
-  const name=$('m-name').value.trim();
-  let url=$('m-url').value.trim();
-  if(!name||!url) return;
-  if(!url.startsWith('http')) url='https://'+url;
-  favs.push({name,url,icon:iconGuess(url)});
-  saveFavsLS(); renderFavs(); closeModal();
-  toast(name+' eklendi ✓');
+  const name=$('m-name').value.trim();let url=$('m-url').value.trim();
+  if(!name||!url)return;
+  if(!url.startsWith('http'))url='https://'+url;
+  favs.push({name,url});saveFavsLS();renderFavs();closeModal();toast(name+' eklendi ✓');
 }
 
-/* ══════════════════════════════════════
-   FİNANS — HuggingFace Space proxy
-   Sadece API_BASE'i güncelle
-══════════════════════════════════════ */
+/* ── TODO ── */
+const TODO_KEY='sp_todo_v1';
+let todos=[];
+let todoOpen=false;
+try{const s=localStorage.getItem(TODO_KEY);todos=s?JSON.parse(s):[];}catch{}
+function saveTodos(){try{localStorage.setItem(TODO_KEY,JSON.stringify(todos));}catch{}}
+function renderTodos(){
+  const list=$('todo-list');
+  list.innerHTML=todos.map((t,i)=>`
+    <div class="todo-item">
+      <div class="todo-cb${t.done?' done':''}" data-i="${i}"></div>
+      <span class="todo-text${t.done?' done':''}" data-i="${i}">${t.text}</span>
+      <button class="todo-rm" data-i="${i}"><i class="ti ti-x"></i></button>
+    </div>`).join('');
+  list.querySelectorAll('.todo-cb,.todo-text').forEach(el=>{
+    el.addEventListener('click',()=>{const i=Number(el.dataset.i);todos[i].done=!todos[i].done;saveTodos();renderTodos();});
+  });
+  list.querySelectorAll('.todo-rm').forEach(btn=>{
+    btn.addEventListener('click',()=>{todos.splice(Number(btn.dataset.i),1);saveTodos();renderTodos();});
+  });
+  const pending=todos.filter(t=>!t.done).length;
+  const badge=$('todo-badge');
+  badge.textContent=pending||'';badge.classList.toggle('show',pending>0);
+}
+renderTodos();
+$('todo-hd').addEventListener('click',()=>{
+  todoOpen=!todoOpen;
+  $('todo-body').classList.toggle('open',todoOpen);
+  $('todo-hd').classList.toggle('open',todoOpen);
+  $('todo-chevron').classList.toggle('open',todoOpen);
+});
+function addTodo(){
+  const text=$('todo-input').value.trim();if(!text)return;
+  todos.unshift({text,done:false});saveTodos();renderTodos();$('todo-input').value='';
+  if(!todoOpen){todoOpen=true;$('todo-body').classList.add('open');$('todo-hd').classList.add('open');$('todo-chevron').classList.add('open');}
+}
+$('todo-add-btn').addEventListener('click',addTodo);
+$('todo-input').addEventListener('keydown',e=>{if(e.key==='Enter')addTodo();});
+
+/* ── STOCKS ── */
 const API_BASE='https://muratmurat16-data-api.hf.space';
-
-let usdTRY=38.5;
-
-/* ── STOCKS listesi (localStorage'den) ── */
 const STOCKS_KEY='sp_stocks_v1';
 const DEFAULT_STOCKS=[
-  {sym:'THYAO.IS', name:'THYAO',    kfmt:false, group:'bist'},
-  {sym:'GARAN.IS', name:'GARAN',    kfmt:false, group:'bist'},
-  {sym:'AKBNK.IS', name:'AKBNK',    kfmt:false, group:'bist'},
-  {sym:'EREGL.IS', name:'EREGL',    kfmt:false, group:'bist'},
-  {sym:'ASELS.IS', name:'ASELS',    kfmt:false, group:'bist'},
-  {sym:'SISE.IS',  name:'SISE',     kfmt:false, group:'bist'},
-  {sym:'KCHOL.IS', name:'KCHOL',    kfmt:false, group:'bist'},
-  {sym:'XU100.IS', name:'BIST 100', kfmt:true,  group:'endeks'},
-  {sym:'^GSPC',    name:'S&P 500',  kfmt:true,  group:'global'},
-  {sym:'^NDX',     name:'NASDAQ',   kfmt:true,  group:'global'},
-  {sym:'^GDAXI',   name:'DAX',      kfmt:true,  group:'global'},
-  {sym:'CL=F',     name:'Petrol WTI',kfmt:false,group:'global'},
+  {sym:'THYAO.IS',name:'THYAO',   kfmt:false,group:'bist'},
+  {sym:'GARAN.IS',name:'GARAN',   kfmt:false,group:'bist'},
+  {sym:'AKBNK.IS',name:'AKBNK',   kfmt:false,group:'bist'},
+  {sym:'EREGL.IS',name:'EREGL',   kfmt:false,group:'bist'},
+  {sym:'ASELS.IS',name:'ASELS',   kfmt:false,group:'bist'},
+  {sym:'SISE.IS', name:'SISE',    kfmt:false,group:'bist'},
+  {sym:'KCHOL.IS',name:'KCHOL',   kfmt:false,group:'bist'},
+  {sym:'XU100.IS',name:'BIST 100',kfmt:true, group:'endeks'},
+  {sym:'^GSPC',   name:'S&P 500', kfmt:true, group:'global'},
+  {sym:'^NDX',    name:'NASDAQ',  kfmt:true, group:'global'},
+  {sym:'^GDAXI',  name:'DAX',     kfmt:true, group:'global'},
+  {sym:'CL=F',    name:'Petrol WTI',kfmt:false,group:'global'},
 ];
 let stockList=[];
 try{const s=localStorage.getItem(STOCKS_KEY);stockList=s?JSON.parse(s):[...DEFAULT_STOCKS];}catch{stockList=[...DEFAULT_STOCKS];}
 function saveStocks(){try{localStorage.setItem(STOCKS_KEY,JSON.stringify(stockList));}catch{}}
+function autoGroup(sym){const u=sym.toUpperCase();if(u==='XU100.IS')return 'endeks';if(u.endsWith('.IS'))return 'bist';if(u.startsWith('^'))return 'global';return 'custom';}
+function autoKfmt(sym){const u=sym.toUpperCase();return u.startsWith('^')||u.includes('XU100');}
 
-/* auto-detect group from symbol */
-function autoGroup(sym){
-  const u=sym.toUpperCase();
-  if(u==='XU100.IS') return 'endeks';
-  if(u.endsWith('.IS')) return 'bist';
-  if(u.startsWith('^')) return 'global';
-  return 'custom';
-}
-/* auto-detect kfmt */
-function autoKfmt(sym){
-  const u=sym.toUpperCase();
-  return u.startsWith('^')||u.includes('XU100')||u.includes('BIST');
-}
-
-/* render right sidebar */
 function renderStocks(){
   const container=$('stocks-container');
   const groups={};
-  for(const s of stockList){
-    const g=s.group||autoGroup(s.sym);
-    (groups[g]=groups[g]||[]).push(s);
-  }
+  for(const s of stockList){const g=s.group||autoGroup(s.sym);(groups[g]=groups[g]||[]).push(s);}
   const ORDER=['bist','endeks','global','custom'];
   const sorted=ORDER.filter(g=>groups[g]).concat(Object.keys(groups).filter(g=>!ORDER.includes(g)));
   let html='';
   for(const g of sorted){
     html+=`<div class="s-label">${g}</div>`;
     for(const s of groups[g]){
-      html+=`
-        <div class="s-row stock-row" data-sym="${s.sym}">
-          <span class="s-name">${s.name}</span>
-          <div class="s-right">
-            <div class="s-val"><span class="ld">···</span></div>
-            <div class="s-chg"></div>
-          </div>
-          <button class="stock-del" data-sym="${s.sym}" title="Kaldır"><i class="ti ti-x"></i></button>
-        </div>`;
+      html+=`<div class="s-row stock-row" data-sym="${s.sym}">
+        <span class="s-name">${s.name}</span>
+        <div class="s-right"><div class="s-val"><span class="ld">···</span></div><div class="s-chg"></div></div>
+        <button class="stock-del" data-sym="${s.sym}"><i class="ti ti-x"></i></button>
+      </div>`;
     }
   }
   container.innerHTML=html;
   container.querySelectorAll('.stock-del').forEach(btn=>{
-    btn.addEventListener('click',e=>{
-      e.stopPropagation();
-      stockList=stockList.filter(s=>s.sym!==btn.dataset.sym);
-      saveStocks(); renderStocks();
-      toast(btn.dataset.sym+' kaldırıldı');
-    });
+    btn.addEventListener('click',e=>{e.stopPropagation();stockList=stockList.filter(s=>s.sym!==btn.dataset.sym);saveStocks();renderStocks();toast(btn.dataset.sym+' kaldırıldı');});
   });
 }
 renderStocks();
 
-function applyStockData(stocksData){
-  for(const s of stockList){
-    const r=stocksData[s.sym];
-    const row=document.querySelector(`.stock-row[data-sym="${s.sym}"]`);
-    if(!row||!r?.price) continue;
-    row.querySelector('.s-val').textContent=(s.kfmt||autoKfmt(s.sym))?fmtK(r.price):fmt(r.price,2);
-    const chgEl=row.querySelector('.s-chg');
-    if(r.change_pct!=null){
-      const v=Number(r.change_pct),cls=v>0?'up':v<0?'dn':'',sign=v>0?'+':'';
-      chgEl.innerHTML=`<span class="${cls}">${sign}${fmt(v,2)}%</span>`;
-    }
-  }
-}
-
+let usdTRY=38.5;
 function applyMarketData(data){
-  /* FX */
   const fx=data.fx||{};
-  if(fx.usd_try){usdTRY=fx.usd_try; setVal('l-usd',fmt(fx.usd_try,4));}
-  if(fx.eur_try) setVal('l-eur',fmt(fx.eur_try,4));
-  if(fx.gbp_try) setVal('l-gbp',fmt(fx.gbp_try,4));
-  if(fx.eur_usd) setVal('l-eurusd',fmt(fx.eur_usd,4));
-
-  /* Metaller */
+  if(fx.usd_try){usdTRY=fx.usd_try;setVal('l-usd',fmt(fx.usd_try,4));}
+  if(fx.eur_try)setVal('l-eur',fmt(fx.eur_try,4));
+  if(fx.gbp_try)setVal('l-gbp',fmt(fx.gbp_try,4));
+  if(fx.eur_usd)setVal('l-eurusd',fmt(fx.eur_usd,4));
   const m=data.metals||{};
-  if(m.gold!=null){
-    setVal('l-xau-usd','$'+fmt(m.gold,0));
-    setVal('l-xau-try',fmt(m.gold*usdTRY,0)+' ₺');
-    setVal('l-xau-ratio',fmt(m.gold/(usdTRY||1),1));
-  }
-  if(m.silver!=null)   setVal('l-xag','$'+fmt(m.silver,3));
-  if(m.platinum!=null) setVal('l-xpt','$'+fmt(m.platinum,0));
-
-  /* Kripto */
+  if(m.gold!=null){setVal('l-xau-usd','$'+fmt(m.gold,0));setVal('l-xau-try',fmt(m.gold*usdTRY,0)+' ₺');setVal('l-xau-ratio',fmt(m.gold/(usdTRY||1),1));}
+  if(m.silver!=null)setVal('l-xag','$'+fmt(m.silver,3));
+  if(m.platinum!=null)setVal('l-xpt','$'+fmt(m.platinum,0));
   const c=data.crypto||{};
-  const cryptoMap={bitcoin:['l-btc','l-btc-c'],ethereum:['l-eth','l-eth-c'],solana:['l-sol','l-sol-c']};
-  for(const [id,[v,chg]] of Object.entries(cryptoMap)){
-    if(c[id]){setVal(v,'$'+fmtK(c[id].price));setChg(chg,c[id].change24h);}
+  const cmap={bitcoin:['l-btc','l-btc-c'],ethereum:['l-eth','l-eth-c'],solana:['l-sol','l-sol-c']};
+  for(const[id,[v,chg]]of Object.entries(cmap)){if(c[id]){setVal(v,'$'+fmtK(c[id].price));setChg(chg,c[id].change24h);}}
+  const s=data.stocks||{};
+  for(const st of stockList){
+    const r=s[st.sym];
+    const row=document.querySelector(`.stock-row[data-sym="${st.sym}"]`);
+    if(!row||!r?.price)continue;
+    row.querySelector('.s-val').textContent=(st.kfmt||autoKfmt(st.sym))?fmtK(r.price):fmt(r.price,2);
+    const chgEl=row.querySelector('.s-chg');
+    if(r.change_pct!=null){const v=Number(r.change_pct),cls=v>0?'up':v<0?'dn':'',sign=v>0?'+':'';chgEl.innerHTML=`<span class="${cls}">${sign}${fmt(v,2)}%</span>`;}
   }
-
-  /* Hisseler */
-  applyStockData(data.stocks||{});
 }
 
 async function fetchBIST(){
-  const ico=$('bist-ico'); ico.classList.add('spin');
+  const ico=$('bist-ico');ico.classList.add('spin');
   try{
     const syms=stockList.map(s=>s.sym).join(',');
     const r=await fetch(`${API_BASE}/market?symbols=${encodeURIComponent(syms)}`,{signal:AbortSignal.timeout(25000)});
-    if(r.ok) applyMarketData(await r.json());
-  }catch(e){console.warn('API hatası:',e);}
+    if(r.ok)applyMarketData(await r.json());
+  }catch(e){console.warn('API:',e);}
   ico.classList.remove('spin');
-  const n=new Date();
-  $('last-upd').textContent=pad(n.getHours())+':'+pad(n.getMinutes());
+  const n=new Date();$('last-upd').textContent=pad(n.getHours())+':'+pad(n.getMinutes());
 }
 $('bist-refresh').addEventListener('click',fetchBIST);
 
-/* ── STOCK ADD MODAL ── */
+/* stock add modal */
 const stockModalBg=$('stock-modal-bg');
-$('stock-add-btn').addEventListener('click',()=>{
-  stockModalBg.classList.add('open');
-  setTimeout(()=>$('sm-sym').focus(),60);
-});
+$('stock-add-btn').addEventListener('click',()=>{stockModalBg.classList.add('open');setTimeout(()=>$('sm-sym').focus(),60);});
 $('stock-modal-cancel').addEventListener('click',closeStockModal);
 stockModalBg.addEventListener('click',e=>{if(e.target===stockModalBg)closeStockModal();});
 $('sm-sym').addEventListener('keydown',e=>{if(e.key==='Enter')$('sm-name').focus();});
 $('sm-name').addEventListener('keydown',e=>{if(e.key==='Enter')saveStock();});
 $('stock-modal-save').addEventListener('click',saveStock);
-
 function closeStockModal(){stockModalBg.classList.remove('open');$('sm-sym').value='';$('sm-name').value='';}
 function saveStock(){
   let sym=$('sm-sym').value.trim().toUpperCase();
   const name=$('sm-name').value.trim()||sym;
   if(!sym){toast('Sembol giriniz');return;}
-  /* BIST kısaltması girilmişse .IS ekle */
-  if(/^[A-Z]{3,6}$/.test(sym)&&!sym.startsWith('^')) sym=sym+'.IS';
+  if(/^[A-Z]{3,6}$/.test(sym)&&!sym.startsWith('^'))sym+='.IS';
   if(stockList.find(s=>s.sym===sym)){toast('Bu sembol zaten listede');return;}
   stockList.push({sym,name,kfmt:autoKfmt(sym),group:autoGroup(sym)});
-  saveStocks(); renderStocks(); closeStockModal();
-  toast(sym+' eklendi ✓');
-  fetchBIST();
+  saveStocks();renderStocks();closeStockModal();toast(sym+' eklendi ✓');fetchBIST();
 }
 
-async function fetchAll(){await fetchBIST();}
-fetchAll();
-setInterval(fetchAll,2*60*1000);
+fetchBIST();
+setInterval(fetchBIST,2*60*1000);
 </script>
 </body>
 </html>
