@@ -294,6 +294,13 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',system-ui,s
 .bg-preset{height:38px;border-radius:9px;cursor:pointer;border:2px solid transparent;transition:border-color .15s,transform .13s}
 .bg-preset:hover{transform:scale(1.06)}
 .bg-preset.active{border-color:var(--accent)}
+.wp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:8px}
+.wp-thumb{position:relative;border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:border-color .15s,transform .13s;aspect-ratio:16/9;background:rgba(255,255,255,.06)}
+.wp-thumb:hover{transform:scale(1.04)}
+.wp-thumb.active{border-color:var(--accent)}
+.wp-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.wp-thumb-name{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.7));font-size:8.5px;font-weight:600;color:#fff;padding:8px 5px 4px;text-align:center;letter-spacing:.3px;opacity:0;transition:opacity .15s}
+.wp-thumb:hover .wp-thumb-name,.wp-thumb.active .wp-thumb-name{opacity:1}
 .bg-url-row{display:flex;gap:6px}
 .bg-url-row input{flex:1;margin-bottom:0}
 .bg-url-btn{background:var(--accent);border:none;border-radius:10px;padding:0 13px;color:#fff;cursor:pointer;font-size:12px;font-family:inherit;white-space:nowrap;transition:background .13s}
@@ -571,6 +578,11 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',system-ui,s
     </div>
 
     <div class="s-sec">
+      <div class="s-sec-title">Duvar Kağıtları</div>
+      <div class="wp-grid" id="wp-grid"></div>
+    </div>
+
+    <div class="s-sec">
       <div class="s-sec-title">Haberler</div>
       <div class="news-cat-sel" id="news-cat-sel"></div>
       <div class="dim-row" style="margin-top:10px">
@@ -663,8 +675,33 @@ BG_PRESETS.forEach(p=>{
 const dimSlider=$('dim-slider'),dimValEl=$('dim-val');
 dimSlider.value=cfg.dim;dimValEl.textContent='%'+cfg.dim;
 dimSlider.addEventListener('input',()=>{cfg.dim=Number(dimSlider.value);dimValEl.textContent='%'+cfg.dim;applyBg();saveCfg();});
-$('bg-url-apply').addEventListener('click',()=>{const url=$('bg-url-input').value.trim();if(!url)return;cfg.bgType='image';cfg.bgImage=url;applyBg();saveCfg();document.querySelectorAll('.bg-preset').forEach(b=>b.classList.remove('active'));toast('arka plan güncellendi ✓');});
+$('bg-url-apply').addEventListener('click',()=>{const url=$('bg-url-input').value.trim();if(!url)return;cfg.bgType='image';cfg.bgImage=url;applyBg();saveCfg();document.querySelectorAll('.bg-preset').forEach(b=>b.classList.remove('active'));renderWpGrid();toast('arka plan güncellendi ✓');});
 $('bg-url-input').addEventListener('keydown',e=>{if(e.key==='Enter')$('bg-url-apply').click();});
+
+/* ── WALLPAPERS ── */
+const WALLPAPERS=[
+  {file:'Astronot.jpg',label:'Astronot'},
+];
+function wpUrl(f){return`wallpapers/${f}`;}
+function applyWallpaper(f){
+  cfg.bgType='image';cfg.bgImage=wpUrl(f);applyBg();saveCfg();
+  document.querySelectorAll('.bg-preset').forEach(b=>b.classList.remove('active'));
+  $('bg-url-input').value='';
+  renderWpGrid();
+}
+function renderWpGrid(){
+  $('wp-grid').innerHTML=WALLPAPERS.map(w=>{
+    const active=cfg.bgType==='image'&&cfg.bgImage===wpUrl(w.file);
+    return `<div class="wp-thumb${active?' active':''}" data-file="${w.file}">
+      <img src="${wpUrl(w.file)}" alt="${w.label}" loading="lazy">
+      <div class="wp-thumb-name">${w.label}</div>
+    </div>`;
+  }).join('');
+  $('wp-grid').querySelectorAll('.wp-thumb').forEach(el=>{
+    el.addEventListener('click',()=>applyWallpaper(el.dataset.file));
+  });
+}
+renderWpGrid();
 
 const seButtons=document.querySelectorAll('.se-btn');
 function updateSeUI(){seButtons.forEach(b=>b.classList.toggle('active',b.dataset.url===cfg.searchUrl));}
