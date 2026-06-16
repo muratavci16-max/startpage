@@ -123,7 +123,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',system-ui,s
 .news-card-meta{font-size:9px;color:rgba(255,255,255,.28)}
 
 /* ── TODO DRAWER ── */
-.todo-fab{position:fixed;bottom:26px;right:20px;z-index:50;background:rgba(255,255,255,.08);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.14);border-radius:24px;padding:7px 14px;display:flex;align-items:center;gap:7px;cursor:pointer;color:rgba(255,255,255,.6);font-size:11px;font-weight:600;font-family:inherit;transition:all .2s;letter-spacing:.4px}
+.todo-fab{position:fixed;top:16px;right:20px;z-index:50;background:rgba(255,255,255,.08);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.14);border-radius:24px;padding:7px 14px;display:flex;align-items:center;gap:7px;cursor:pointer;color:rgba(255,255,255,.6);font-size:11px;font-weight:600;font-family:inherit;transition:all .2s;letter-spacing:.4px}
 .todo-fab:hover{border-color:var(--accent);color:var(--accent);background:rgba(238,118,35,.1)}
 .todo-fab-badge{background:var(--accent);color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 5px;min-width:16px;text-align:center;display:none}
 .todo-fab-badge.show{display:inline}
@@ -721,7 +721,7 @@ renderNewsCats();
 
 async function fetchNews(force=false){
   const cat=cfg.newsCategory,lim=cfg.newsLimit||8,ckey=cat+'_'+lim;
-  if(!force&&newsCache[ckey]&&Date.now()-newsCache[ckey].ts<5*60*1000){renderNewsCards(newsCache[ckey].items);return;}
+  if(!force&&newsCache[ckey]&&Date.now()-newsCache[ckey].ts<20*60*1000){renderNewsCards(newsCache[ckey].items);return;}
   $('news-scroll').innerHTML='<div style="font-size:11px;color:var(--muted2);padding:10px 4px"><span class="ld">yükleniyor···</span></div>';
   try{
     const r=await fetch(`${NEWS_API}?category=${cat}&limit=${lim}`,{signal:AbortSignal.timeout(10000)});
