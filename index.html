@@ -130,20 +130,24 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',system-ui,s
 .todo-add-btn:hover{color:var(--accent)}
 
 /* NEWS */
-.news-list{max-height:260px;overflow-y:auto;scrollbar-width:none}
-.news-list::-webkit-scrollbar{display:none}
-.news-item{display:flex;gap:10px;padding:9px 13px;text-decoration:none;color:inherit;border-bottom:1px solid rgba(255,255,255,.05);transition:background .13s}
-.news-item:hover{background:rgba(255,255,255,.04)}
-.news-item:last-child{border-bottom:none}
-.news-img{width:64px;height:46px;border-radius:7px;object-fit:cover;flex-shrink:0;background:rgba(255,255,255,.07)}
-.news-img-ph{width:64px;height:46px;border-radius:7px;flex-shrink:0;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:18px}
-.news-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
-.news-title{font-size:11.5px;font-weight:600;color:rgba(255,255,255,.88);line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.news-desc{font-size:10px;color:rgba(255,255,255,.4);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.news-meta{font-size:9px;color:rgba(255,255,255,.25);margin-top:2px}
-.news-cat-row{display:flex;gap:6px;flex-wrap:wrap;padding:8px 13px 4px;border-bottom:1px solid rgba(255,255,255,.06)}
-.news-cat-btn{font-size:9.5px;padding:3px 10px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.4);cursor:pointer;font-family:inherit;transition:all .13s}
-.news-cat-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(238,118,35,.1)}
+.news-section{width:100%;margin-top:4px}
+.news-top{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.news-top-label{font-size:11px;font-weight:600;color:rgba(255,255,255,.5);letter-spacing:.5px;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.news-cats{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;flex:1}
+.news-cats::-webkit-scrollbar{display:none}
+.news-cat-btn{font-size:10px;padding:3px 11px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.38);cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.news-cat-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(238,118,35,.12)}
+.news-cat-btn:hover:not(.active){border-color:rgba(255,255,255,.22);color:rgba(255,255,255,.6)}
+.news-scroll{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;cursor:grab;user-select:none}
+.news-scroll::-webkit-scrollbar{display:none}
+.news-scroll.dragging{cursor:grabbing}
+.news-card{flex-shrink:0;width:180px;text-decoration:none;color:inherit;display:flex;flex-direction:column;background:rgba(255,255,255,.04);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.07);border-radius:12px;overflow:hidden;transition:border-color .15s,transform .15s}
+.news-card:hover{border-color:rgba(255,255,255,.15);transform:translateY(-2px)}
+.news-card-img{width:100%;height:100px;object-fit:cover;display:block;background:rgba(255,255,255,.05)}
+.news-card-img-ph{width:100%;height:100px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font-size:26px;color:rgba(255,255,255,.2)}
+.news-card-body{padding:10px;display:flex;flex-direction:column;gap:5px;flex:1}
+.news-card-title{font-size:11px;font-weight:600;color:rgba(255,255,255,.82);line-height:1.4;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.news-card-meta{font-size:9.5px;color:rgba(255,255,255,.28);margin-top:auto}
 
 /* SETTINGS BTN */
 .settings-btn{position:absolute;bottom:14px;right:14px;background:rgba(255,255,255,.06);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,.4);font-size:15px;transition:all .15s}
@@ -268,16 +272,13 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',system-ui,s
   </div>
 
   <!-- NEWS -->
-  <div class="panel-widget" id="news-widget" style="max-width:480px;width:100%">
-    <div class="panel-hd" id="news-hd">
-      <i class="ti ti-news" style="font-size:12px;color:var(--muted2)"></i>
-      <span class="panel-hd-label" id="news-hd-label">haberler</span>
-      <span class="panel-badge show" id="news-badge" style="background:rgba(255,255,255,.15);color:rgba(255,255,255,.5)">···</span>
-      <i class="ti ti-chevron-down panel-chevron" id="news-chevron"></i>
+  <div class="news-section" id="news-section">
+    <div class="news-top">
+      <div class="news-top-label"><i class="ti ti-news" style="font-size:12px"></i>haberler</div>
+      <div class="news-cats" id="news-cats"></div>
     </div>
-    <div class="panel-body" id="news-body">
-      <div class="news-cat-row" id="news-cat-row"></div>
-      <div class="news-list" id="news-list"><div style="padding:16px;text-align:center;font-size:11px;color:var(--muted2)"><span class="ld">yükleniyor···</span></div></div>
+    <div class="news-scroll" id="news-scroll">
+      <div style="font-size:11px;color:var(--muted2);padding:20px 4px"><span class="ld">yükleniyor···</span></div>
     </div>
   </div>
 
@@ -345,8 +346,13 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',system-ui,s
     </div>
 
     <div class="s-sec">
-      <div class="s-sec-title">Haber Kategorisi</div>
+      <div class="s-sec-title">Haberler</div>
       <div class="news-cat-sel" id="news-cat-sel"></div>
+      <div class="dim-row" style="margin-top:10px">
+        <span class="dim-lbl">Haber Sayısı</span>
+        <input type="range" class="dim-slider" id="news-limit-slider" min="3" max="20" step="1" value="8">
+        <span class="dim-val" id="news-limit-val">8</span>
+      </div>
     </div>
 
     <div class="s-sec">
@@ -402,7 +408,7 @@ const NEWS_CATS=['finans','fintech','teknoloji','gundem','spor'];
 const cfg={
   bgType:'gradient',bgGradient:BG_PRESETS[0].css,bgImage:'',dim:38,
   searchUrl:'https://www.google.com/search?q=',
-  newsCategory:'finans',
+  newsCategory:'finans',newsLimit:8,
   worldClocks:[
     {city:'İstanbul',tz:'Europe/Istanbul'},
     {city:'Londra',  tz:'Europe/London'},
@@ -563,60 +569,73 @@ $('todo-input').addEventListener('keydown',e=>{if(e.key==='Enter')addTodo();});
 
 /* ── NEWS ── */
 const NEWS_API='https://muratmurat16-haber-api.hf.space/news';
-let newsOpen=false;
 let newsCache={};
 
+function renderNewsCats(){
+  $('news-cats').innerHTML=NEWS_CATS.map(c=>`<button class="news-cat-btn${cfg.newsCategory===c?' active':''}" data-cat="${c}">${c}</button>`).join('');
+  $('news-cats').querySelectorAll('.news-cat-btn').forEach(b=>b.addEventListener('click',()=>{
+    cfg.newsCategory=b.dataset.cat;saveCfg();renderNewsCats();renderNewsCatSel();fetchNews(true);
+  }));
+}
 function renderNewsCatSel(){
   $('news-cat-sel').innerHTML=NEWS_CATS.map(c=>`<button class="ncat-btn${cfg.newsCategory===c?' active':''}" data-cat="${c}">${c}</button>`).join('');
-  $('news-cat-sel').querySelectorAll('.ncat-btn').forEach(b=>b.addEventListener('click',()=>{cfg.newsCategory=b.dataset.cat;saveCfg();renderNewsCatSel();renderNewsCatRow();fetchNews(true);}));
+  $('news-cat-sel').querySelectorAll('.ncat-btn').forEach(b=>b.addEventListener('click',()=>{
+    cfg.newsCategory=b.dataset.cat;saveCfg();renderNewsCatSel();renderNewsCats();fetchNews(true);
+  }));
 }
-function renderNewsCatRow(){
-  $('news-cat-row').innerHTML=NEWS_CATS.map(c=>`<button class="news-cat-btn${cfg.newsCategory===c?' active':''}" data-cat="${c}">${c}</button>`).join('');
-  $('news-cat-row').querySelectorAll('.news-cat-btn').forEach(b=>b.addEventListener('click',()=>{cfg.newsCategory=b.dataset.cat;saveCfg();renderNewsCatRow();renderNewsCatSel();fetchNews(true);}));
-}
-renderNewsCatRow();
+renderNewsCats();
+fetchNews();
+
+/* drag-to-scroll */
+(function(){
+  const el=$('news-scroll');
+  let down=false,sx=0,sl=0;
+  el.addEventListener('mousedown',e=>{down=true;sx=e.pageX;sl=el.scrollLeft;el.classList.add('dragging');});
+  document.addEventListener('mouseup',()=>{down=false;$('news-scroll').classList.remove('dragging');});
+  el.addEventListener('mousemove',e=>{if(!down)return;e.preventDefault();el.scrollLeft=sl-(e.pageX-sx);});
+})();
 
 async function fetchNews(force=false){
   const cat=cfg.newsCategory;
-  if(!force&&newsCache[cat]&&Date.now()-newsCache[cat].ts<5*60*1000){renderNews(newsCache[cat].items);return;}
+  const lim=cfg.newsLimit||8;
+  const ckey=cat+'_'+lim;
+  if(!force&&newsCache[ckey]&&Date.now()-newsCache[ckey].ts<5*60*1000){renderNewsCards(newsCache[ckey].items);return;}
+  $('news-scroll').innerHTML='<div style="font-size:11px;color:var(--muted2);padding:20px 4px"><span class="ld">yükleniyor···</span></div>';
   try{
-    const r=await fetch(`${NEWS_API}?category=${cat}`,{signal:AbortSignal.timeout(10000)});
+    const r=await fetch(`${NEWS_API}?category=${cat}&limit=${lim}`,{signal:AbortSignal.timeout(10000)});
     if(!r.ok)return;
     const data=await r.json();
     const items=Array.isArray(data)?data:(data.news||data.articles||data.items||[]);
-    newsCache[cat]={items,ts:Date.now()};
-    renderNews(items);
-  }catch(e){console.warn('News:',e);}
+    newsCache[ckey]={items,ts:Date.now()};
+    renderNewsCards(items);
+  }catch(e){console.warn('News:',e);$('news-scroll').innerHTML='<div style="font-size:11px;color:var(--muted2);padding:20px 4px">haber yüklenemedi</div>';}
 }
-function renderNews(items){
-  if(!items||!items.length){$('news-list').innerHTML='<div style="padding:14px;text-align:center;font-size:11px;color:var(--muted2)">haber bulunamadı</div>';return;}
-  $('news-badge').textContent=items.length;
-  $('news-hd-label').textContent=cfg.newsCategory+' haberleri';
-  $('news-list').innerHTML=items.slice(0,8).map(n=>{
+function renderNewsCards(items){
+  if(!items||!items.length){$('news-scroll').innerHTML='<div style="font-size:11px;color:var(--muted2);padding:20px 4px">haber bulunamadı</div>';return;}
+  $('news-scroll').innerHTML=items.map(n=>{
     const img=n.image||n.urlToImage||n.img||n.thumbnail||'';
     const title=n.title||n.baslik||'';
-    const desc=n.description||n.desc||n.summary||'';
     const url=n.url||n.link||'#';
     const src=n.source||n.kaynak||'';
     const imgHtml=img
-      ?`<img class="news-img" src="${img}" alt="" onerror="this.parentNode.innerHTML='<div class=news-img-ph>📰</div>'">`
-      :`<div class="news-img-ph">📰</div>`;
-    return `<a class="news-item" href="${url}" target="_blank" rel="noopener">
+      ?`<img class="news-card-img" src="${img}" alt="" draggable="false" onerror="this.outerHTML='<div class=news-card-img-ph><i class=ti ti-news></i></div>'">`
+      :`<div class="news-card-img-ph"><i class="ti ti-news"></i></div>`;
+    return `<a class="news-card" href="${url}" target="_blank" rel="noopener">
       ${imgHtml}
-      <div class="news-body">
-        <div class="news-title">${title}</div>
-        ${desc?`<div class="news-desc">${desc}</div>`:''}
-        ${src?`<div class="news-meta">${src}</div>`:''}
+      <div class="news-card-body">
+        <div class="news-card-title">${title}</div>
+        ${src?`<div class="news-card-meta">${src}</div>`:''}
       </div></a>`;
   }).join('');
 }
-$('news-hd').addEventListener('click',()=>{
-  newsOpen=!newsOpen;
-  $('news-body').classList.toggle('open',newsOpen);
-  $('news-hd').classList.toggle('open',newsOpen);
-  $('news-chevron').classList.toggle('open',newsOpen);
-  if(newsOpen)fetchNews();
-});
+
+/* news limit slider */
+(function(){
+  const sl=$('news-limit-slider'),vl=$('news-limit-val');
+  sl.value=cfg.newsLimit||8;vl.textContent=sl.value;
+  sl.addEventListener('input',()=>{vl.textContent=sl.value;});
+  sl.addEventListener('change',()=>{cfg.newsLimit=+sl.value;saveCfg();fetchNews(true);});
+})();
 
 /* ── STOCKS ── */
 const API_BASE='https://muratmurat16-data-api.hf.space';
