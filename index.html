@@ -19,19 +19,84 @@
   --muted2:rgba(255,255,255,0.28);
   --up:#4caf88;--dn:#e05555;
   --blur:22px;
-  --sw:240px;
 }
 html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',system-ui,sans-serif;color:var(--text)}
 
 #bg{position:fixed;inset:0;z-index:0;background:linear-gradient(135deg,#0d1b2a 0%,#1b2838 45%,#0f2027 100%);transition:background .6s}
 #bg-img{position:fixed;inset:0;z-index:1;background-size:cover;background-position:center;opacity:0;transition:opacity .6s}
 #bg-overlay{position:fixed;inset:0;z-index:2;background:rgba(0,0,0,.38);transition:background .4s}
-.page{position:relative;z-index:3;width:100vw;height:100vh;display:grid;grid-template-columns:var(--sw) 1fr;overflow:hidden}
 
-/* ── LEFT SIDEBAR ── */
-.sidebar{background:var(--glass);backdrop-filter:blur(var(--blur));-webkit-backdrop-filter:blur(var(--blur));border-right:1px solid var(--border);padding:16px 11px 12px;display:flex;flex-direction:column;overflow-y:auto;scrollbar-width:none}
-.sidebar::-webkit-scrollbar{display:none}
-.sb-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:0 3px}
+/* ── PAGE LAYOUT ── */
+.page{position:relative;z-index:3;width:100vw;height:100vh;display:flex;overflow:hidden}
+
+/* ── ICON RAIL ── */
+.icon-rail{
+  width:72px;flex-shrink:0;
+  background:rgba(6,6,10,.85);
+  backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+  border-right:1px solid rgba(255,255,255,.08);
+  display:flex;flex-direction:column;align-items:center;
+  padding:14px 0;gap:4px;z-index:10;
+}
+.rail-logo{
+  width:36px;height:36px;display:flex;align-items:center;justify-content:center;
+  margin-bottom:8px;
+}
+.rail-logo-dot{
+  width:10px;height:10px;background:var(--accent);border-radius:50%;
+  box-shadow:0 0 12px var(--accent);
+}
+.rail-btn{
+  position:relative;width:52px;height:52px;border:none;background:transparent;
+  cursor:pointer;border-radius:12px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:4px;color:rgba(255,255,255,.38);
+  font-size:20px;transition:all .15s;border-left:2px solid transparent;
+  font-family:inherit;
+}
+.rail-btn:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.7);}
+.rail-btn.active{background:rgba(238,118,35,.12);color:var(--accent);border-left-color:var(--accent);}
+.rail-btn-label{
+  font-size:8px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;
+  color:inherit;line-height:1;
+}
+.rail-tooltip{
+  position:absolute;left:62px;top:50%;transform:translateY(-50%);
+  background:rgba(10,10,16,.96);border:1px solid rgba(255,255,255,.1);
+  border-radius:8px;padding:5px 10px;font-size:11px;font-weight:500;
+  white-space:nowrap;color:rgba(255,255,255,.8);pointer-events:none;
+  opacity:0;transition:opacity .15s;z-index:200;
+}
+.rail-btn:hover .rail-tooltip{opacity:1;}
+
+/* ── SIDE PANEL ── */
+.side-panel{
+  width:0;flex-shrink:0;overflow:hidden;
+  transition:width .28s cubic-bezier(.4,0,.2,1);
+  background:rgba(8,8,14,.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-right:1px solid rgba(255,255,255,.08);
+  display:flex;flex-direction:column;position:relative;z-index:9;
+}
+.side-panel.open{width:375px;}
+
+.sp-content{display:none;flex-direction:column;height:100%;width:375px;}
+.sp-content.active{display:flex;}
+
+.sp-hd{
+  display:flex;align-items:center;padding:14px 16px 10px;gap:10px;
+  border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;
+}
+.sp-hd-title{flex:1;font-size:12px;font-weight:700;color:var(--text);letter-spacing:.3px;display:flex;align-items:center;gap:8px;}
+.sp-hd-ext{color:var(--muted2);text-decoration:none;font-size:16px;transition:color .13s;}
+.sp-hd-ext:hover{color:var(--accent);}
+
+.sp-iframe{flex:1;width:100%;border:none;display:block;}
+
+/* Borsa panel */
+.sp-borsa-inner{flex:1;overflow-y:auto;scrollbar-width:none;padding:10px 11px 12px;}
+.sp-borsa-inner::-webkit-scrollbar{display:none;}
+.sp-borsa-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding:0 3px;}
+
+/* ── BORSA / SIDEBAR DATA STYLES ── */
 .logo{display:flex;align-items:center;gap:7px}
 .logo-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;box-shadow:0 0 10px var(--accent)}
 .logo-txt{font-size:10px;font-weight:700;color:var(--accent);letter-spacing:1.4px;text-transform:uppercase}
@@ -52,16 +117,35 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',system-ui,s
 .spin{animation:spin .7s linear infinite}
 .spin-slow{animation:spin 2s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.sb-divider{height:1px;background:var(--border);margin:12px 4px 8px}
-.sb-section-hd{display:flex;align-items:center;justify-content:space-between;padding:0 3px;margin-bottom:8px}
 .last-upd{margin-top:auto;padding-top:10px;border-top:1px solid var(--border);font-size:9px;color:var(--muted2);text-align:center;line-height:1.8}
 .last-upd span{color:var(--muted)}
-.stock-del{display:none;position:absolute;right:0;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted2);cursor:pointer;padding:2px 5px;border-radius:4px;font-size:11px;transition:color .12s}
+.stock-del{display:none;position:absolute;right:0;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted2);cursor:pointer;padding:2px 5px;border-radius:4px;font-size:11px;transition:color .12px}
 .s-row:hover .stock-del{display:block}
 .stock-del:hover{color:var(--dn)}
 
+/* ── CALCULATOR ── */
+.sp-calc-wrap{flex:1;display:flex;flex-direction:column;padding:16px;gap:12px;}
+.calc-screen{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px 20px;text-align:right;}
+.calc-expr{font-size:12px;color:rgba(255,255,255,.3);min-height:18px;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.calc-display{font-size:36px;font-weight:200;color:#fff;letter-spacing:-1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;flex:1;}
+.calc-btn{
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;color:var(--text);font-size:18px;font-weight:400;
+  cursor:pointer;font-family:inherit;transition:all .12s;display:flex;
+  align-items:center;justify-content:center;min-height:58px;
+}
+.calc-btn:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.16);}
+.calc-btn:active{transform:scale(.94);}
+.calc-btn.fn{background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);font-size:15px;}
+.calc-btn.op{background:rgba(238,118,35,.18);border-color:rgba(238,118,35,.3);color:var(--accent);font-size:20px;}
+.calc-btn.op:hover{background:rgba(238,118,35,.28);}
+.calc-btn.eq{background:var(--accent);border-color:var(--accent);color:#fff;font-size:20px;}
+.calc-btn.eq:hover{background:var(--accent-dk);}
+.calc-btn.wide{grid-column:span 2;}
+
 /* ── CENTER WRAP ── */
-.center-wrap{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.center-wrap{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
 .center{flex:1;overflow-y:auto;scrollbar-width:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px 32px 16px;position:relative}
 .center::-webkit-scrollbar{display:none}
 .clock{font-size:66px;font-weight:200;color:#fff;letter-spacing:-3px;line-height:1;font-variant-numeric:tabular-nums;text-align:center;text-shadow:0 2px 30px rgba(0,0,0,.45)}
@@ -183,7 +267,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',system-ui,s
 .todo-empty{padding:28px 16px;text-align:center;font-size:11.5px;color:rgba(255,255,255,.22);line-height:1.7}
 
 /* SETTINGS BTN */
-.settings-btn{position:absolute;bottom:14px;left:14px;background:rgba(255,255,255,.06);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,.4);font-size:15px;transition:all .15s}
+.settings-btn{position:absolute;bottom:14px;right:14px;background:rgba(255,255,255,.06);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,.4);font-size:15px;transition:all .15s}
 .settings-btn:hover{color:var(--accent);border-color:var(--accent);background:rgba(238,118,35,.1)}
 
 /* MODALS */
@@ -245,69 +329,181 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',system-ui,s
 
 <div class="page">
 
-<!-- LEFT SIDEBAR: piyasa + borsa -->
-<div class="sidebar">
-  <div class="sb-hd">
-    <div class="logo"><div class="logo-dot"></div><span class="logo-txt">piyasa</span></div>
-    <div class="dot-live"></div>
-  </div>
-  <div class="s-label">döviz</div>
-  <div class="s-row"><span class="s-name">USD / TRY</span><div class="s-right"><div class="s-val" id="l-usd"><span class="ld">···</span></div></div></div>
-  <div class="s-row"><span class="s-name">EUR / TRY</span><div class="s-right"><div class="s-val" id="l-eur"><span class="ld">···</span></div></div></div>
-  <div class="s-row"><span class="s-name">GBP / TRY</span><div class="s-right"><div class="s-val" id="l-gbp"><span class="ld">···</span></div></div></div>
-  <div class="s-row"><span class="s-name">EUR / USD</span><div class="s-right"><div class="s-val" id="l-eurusd"><span class="ld">···</span></div></div></div>
-  <div class="s-label">değerli madenler</div>
-  <div class="s-row"><span class="s-name">Gram Altın ₺</span><div class="s-right"><div class="s-val" id="l-xau-try"><span class="ld">···</span></div></div></div>
-  <div class="s-row"><span class="s-name">ONS Altın $</span><div class="s-right"><div class="s-val" id="l-xau-usd"><span class="ld">···</span></div></div></div>
-  <div class="s-row"><span class="s-name">Gram Gümüş ₺</span><div class="s-right"><div class="s-val" id="l-xag-try"><span class="ld">···</span></div></div></div>
-  <div class="s-row"><span class="s-name">Gram Platin ₺</span><div class="s-right"><div class="s-val" id="l-xpt-try"><span class="ld">···</span></div></div></div>
-  <div class="s-label">kripto</div>
-  <div class="s-row"><span class="s-name">BTC</span><div class="s-right"><div class="s-val" id="l-btc"><span class="ld">···</span></div><div class="s-chg" id="l-btc-c"></div></div></div>
-  <div class="s-row"><span class="s-name">ETH</span><div class="s-right"><div class="s-val" id="l-eth"><span class="ld">···</span></div><div class="s-chg" id="l-eth-c"></div></div></div>
-  <div class="s-row"><span class="s-name">SOL</span><div class="s-right"><div class="s-val" id="l-sol"><span class="ld">···</span></div><div class="s-chg" id="l-sol-c"></div></div></div>
-  <div class="sb-divider"></div>
-  <div class="sb-section-hd">
-    <div class="logo"><div class="logo-dot" style="background:#7c8cff;box-shadow:0 0 10px #7c8cff"></div><span class="logo-txt" style="color:#7c8cff">borsa</span></div>
-    <div style="display:flex;gap:2px">
-      <button class="ref-btn" id="stock-add-btn" title="Hisse ekle"><i class="ti ti-plus"></i></button>
-      <button class="ref-btn" id="bist-refresh" aria-label="Yenile"><i class="ti ti-refresh" id="bist-ico"></i></button>
-    </div>
-  </div>
-  <div id="stocks-container"></div>
-  <div class="last-upd">son güncelleme<br><span id="last-upd">—</span></div>
-</div>
-
-<!-- CENTER WRAP -->
-<div class="center-wrap">
-  <div class="center">
-    <div style="text-align:center">
-      <div class="clock" id="clock">00:00</div>
-      <div class="datestr" id="datestr">—</div>
-      <div class="weather-line" id="weather-line" title="Konumu yenile"><span class="ld">···</span></div>
-    </div>
-    <div class="world-clocks" id="world-clocks"></div>
-    <div class="search-wrap">
-      <input class="search-input" id="q" type="text" placeholder="Ara..." autocomplete="off" spellcheck="false">
-      <button class="search-btn" id="search-btn" aria-label="Ara"><i class="ti ti-search"></i></button>
-    </div>
-    <div class="favs-area">
-      <div class="favs-grid" id="favs-grid"></div>
-      <button class="add-btn" id="add-btn"><i class="ti ti-plus" style="font-size:12px"></i>site ekle</button>
-    </div>
-    <button class="settings-btn" id="settings-btn" aria-label="Ayarlar"><i class="ti ti-settings"></i></button>
+  <!-- ICON RAIL -->
+  <div class="icon-rail">
+    <div class="rail-logo"><div class="rail-logo-dot"></div></div>
+    <button class="rail-btn" data-panel="borsa">
+      <i class="ti ti-trending-up"></i>
+      <span class="rail-btn-label">Borsa</span>
+      <span class="rail-tooltip">Borsa &amp; Piyasa</span>
+    </button>
+    <button class="rail-btn" data-panel="whatsapp">
+      <i class="ti ti-brand-whatsapp"></i>
+      <span class="rail-btn-label">WA</span>
+      <span class="rail-tooltip">WhatsApp Web</span>
+    </button>
+    <button class="rail-btn" data-panel="wordle">
+      <i class="ti ti-puzzle"></i>
+      <span class="rail-btn-label">Wordle</span>
+      <span class="rail-tooltip">Wordle Türkçe</span>
+    </button>
+    <button class="rail-btn" data-panel="telegram">
+      <i class="ti ti-brand-telegram"></i>
+      <span class="rail-btn-label">TG</span>
+      <span class="rail-tooltip">Telegram Web</span>
+    </button>
+    <button class="rail-btn" data-panel="speedtest">
+      <i class="ti ti-gauge"></i>
+      <span class="rail-btn-label">Hız</span>
+      <span class="rail-tooltip">Hız Testi</span>
+    </button>
+    <button class="rail-btn" data-panel="calc">
+      <i class="ti ti-calculator"></i>
+      <span class="rail-btn-label">Calc</span>
+      <span class="rail-tooltip">Hesap Makinası</span>
+    </button>
   </div>
 
-  <!-- NEWS BAR — bottom -->
-  <div class="news-bar">
-    <div class="news-bar-top">
-      <div class="news-bar-label"><i class="ti ti-rss" style="font-size:11px"></i>haberler</div>
-      <div class="news-cats" id="news-cats"></div>
+  <!-- SIDE PANEL -->
+  <div class="side-panel" id="side-panel">
+
+    <!-- BORSA PANEL -->
+    <div class="sp-content" id="sp-borsa">
+      <div class="sp-borsa-inner">
+        <div class="sp-borsa-hd">
+          <div style="display:flex;align-items:center;gap:7px">
+            <div class="logo-dot"></div>
+            <span class="logo-txt">piyasa &amp; borsa</span>
+            <div class="dot-live"></div>
+          </div>
+          <div style="display:flex;gap:2px">
+            <button class="ref-btn" id="stock-add-btn" title="Hisse ekle"><i class="ti ti-plus"></i></button>
+            <button class="ref-btn" id="bist-refresh"><i class="ti ti-refresh" id="bist-ico"></i></button>
+          </div>
+        </div>
+        <div class="s-label">döviz</div>
+        <div class="s-row"><span class="s-name">USD / TRY</span><div class="s-right"><div class="s-val" id="l-usd"><span class="ld">···</span></div></div></div>
+        <div class="s-row"><span class="s-name">EUR / TRY</span><div class="s-right"><div class="s-val" id="l-eur"><span class="ld">···</span></div></div></div>
+        <div class="s-row"><span class="s-name">GBP / TRY</span><div class="s-right"><div class="s-val" id="l-gbp"><span class="ld">···</span></div></div></div>
+        <div class="s-row"><span class="s-name">EUR / USD</span><div class="s-right"><div class="s-val" id="l-eurusd"><span class="ld">···</span></div></div></div>
+        <div class="s-label">değerli madenler</div>
+        <div class="s-row"><span class="s-name">Gram Altın ₺</span><div class="s-right"><div class="s-val" id="l-xau-try"><span class="ld">···</span></div></div></div>
+        <div class="s-row"><span class="s-name">ONS Altın $</span><div class="s-right"><div class="s-val" id="l-xau-usd"><span class="ld">···</span></div></div></div>
+        <div class="s-row"><span class="s-name">Gram Gümüş ₺</span><div class="s-right"><div class="s-val" id="l-xag-try"><span class="ld">···</span></div></div></div>
+        <div class="s-row"><span class="s-name">Gram Platin ₺</span><div class="s-right"><div class="s-val" id="l-xpt-try"><span class="ld">···</span></div></div></div>
+        <div class="s-label">kripto</div>
+        <div class="s-row"><span class="s-name">BTC</span><div class="s-right"><div class="s-val" id="l-btc"><span class="ld">···</span></div><div class="s-chg" id="l-btc-c"></div></div></div>
+        <div class="s-row"><span class="s-name">ETH</span><div class="s-right"><div class="s-val" id="l-eth"><span class="ld">···</span></div><div class="s-chg" id="l-eth-c"></div></div></div>
+        <div class="s-row"><span class="s-name">SOL</span><div class="s-right"><div class="s-val" id="l-sol"><span class="ld">···</span></div><div class="s-chg" id="l-sol-c"></div></div></div>
+        <div class="s-label" style="margin-top:14px">borsa</div>
+        <div id="stocks-container"></div>
+        <div class="last-upd" style="margin-top:auto;padding-top:10px;border-top:1px solid var(--border);font-size:9px;color:var(--muted2);text-align:center;line-height:1.8">son güncelleme<br><span id="last-upd">—</span></div>
+      </div>
     </div>
-    <div class="news-scroll" id="news-scroll">
-      <div style="font-size:11px;color:var(--muted2);padding:10px 4px"><span class="ld">yükleniyor···</span></div>
+
+    <!-- WHATSAPP PANEL -->
+    <div class="sp-content" id="sp-whatsapp">
+      <div class="sp-hd">
+        <div class="sp-hd-title"><i class="ti ti-brand-whatsapp"></i>WhatsApp Web</div>
+        <a href="https://web.whatsapp.com" target="_blank" class="sp-hd-ext" title="Yeni sekmede aç"><i class="ti ti-external-link"></i></a>
+      </div>
+      <iframe class="sp-iframe" src="https://web.whatsapp.com" allow="camera;microphone"></iframe>
+    </div>
+
+    <!-- WORDLE PANEL -->
+    <div class="sp-content" id="sp-wordle">
+      <div class="sp-hd">
+        <div class="sp-hd-title"><i class="ti ti-puzzle"></i>Wordle Türkçe</div>
+        <a href="https://wordleturkce.bundle.app/" target="_blank" class="sp-hd-ext" title="Yeni sekmede aç"><i class="ti ti-external-link"></i></a>
+      </div>
+      <iframe class="sp-iframe" src="https://wordleturkce.bundle.app/"></iframe>
+    </div>
+
+    <!-- TELEGRAM PANEL -->
+    <div class="sp-content" id="sp-telegram">
+      <div class="sp-hd">
+        <div class="sp-hd-title"><i class="ti ti-brand-telegram"></i>Telegram Web</div>
+        <a href="https://web.telegram.org" target="_blank" class="sp-hd-ext" title="Yeni sekmede aç"><i class="ti ti-external-link"></i></a>
+      </div>
+      <iframe class="sp-iframe" src="https://web.telegram.org/k/"></iframe>
+    </div>
+
+    <!-- SPEEDTEST PANEL -->
+    <div class="sp-content" id="sp-speedtest">
+      <div class="sp-hd">
+        <div class="sp-hd-title"><i class="ti ti-gauge"></i>Hız Testi</div>
+        <a href="https://www.speedtest.net" target="_blank" class="sp-hd-ext" title="Yeni sekmede aç"><i class="ti ti-external-link"></i></a>
+      </div>
+      <iframe class="sp-iframe" src="https://www.speedtest.net"></iframe>
+    </div>
+
+    <!-- CALCULATOR PANEL -->
+    <div class="sp-content" id="sp-calc">
+      <div class="sp-hd">
+        <div class="sp-hd-title"><i class="ti ti-calculator"></i>Hesap Makinası</div>
+      </div>
+      <div class="sp-calc-wrap">
+        <div class="calc-screen">
+          <div class="calc-expr" id="calc-expr">&nbsp;</div>
+          <div class="calc-display" id="calc-display">0</div>
+        </div>
+        <div class="calc-grid">
+          <button class="calc-btn fn" onclick="calcPress('AC')">AC</button>
+          <button class="calc-btn fn" onclick="calcPress('±')">±</button>
+          <button class="calc-btn fn" onclick="calcPress('%')">%</button>
+          <button class="calc-btn op" onclick="calcPress('÷')">÷</button>
+          <button class="calc-btn" onclick="calcPress('7')">7</button>
+          <button class="calc-btn" onclick="calcPress('8')">8</button>
+          <button class="calc-btn" onclick="calcPress('9')">9</button>
+          <button class="calc-btn op" onclick="calcPress('×')">×</button>
+          <button class="calc-btn" onclick="calcPress('4')">4</button>
+          <button class="calc-btn" onclick="calcPress('5')">5</button>
+          <button class="calc-btn" onclick="calcPress('6')">6</button>
+          <button class="calc-btn op" onclick="calcPress('-')">−</button>
+          <button class="calc-btn" onclick="calcPress('1')">1</button>
+          <button class="calc-btn" onclick="calcPress('2')">2</button>
+          <button class="calc-btn" onclick="calcPress('3')">3</button>
+          <button class="calc-btn op" onclick="calcPress('+')">+</button>
+          <button class="calc-btn wide" onclick="calcPress('0')">0</button>
+          <button class="calc-btn" onclick="calcPress('.')">.</button>
+          <button class="calc-btn eq" onclick="calcPress('=')">=</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.side-panel -->
+
+  <!-- CENTER WRAP -->
+  <div class="center-wrap">
+    <div class="center">
+      <div style="text-align:center">
+        <div class="clock" id="clock">00:00</div>
+        <div class="datestr" id="datestr">—</div>
+        <div class="weather-line" id="weather-line" title="Konumu yenile"><span class="ld">···</span></div>
+      </div>
+      <div class="world-clocks" id="world-clocks"></div>
+      <div class="search-wrap">
+        <input class="search-input" id="q" type="text" placeholder="Ara..." autocomplete="off" spellcheck="false">
+        <button class="search-btn" id="search-btn" aria-label="Ara"><i class="ti ti-search"></i></button>
+      </div>
+      <div class="favs-area">
+        <div class="favs-grid" id="favs-grid"></div>
+        <button class="add-btn" id="add-btn"><i class="ti ti-plus" style="font-size:12px"></i>site ekle</button>
+      </div>
+      <button class="settings-btn" id="settings-btn" aria-label="Ayarlar"><i class="ti ti-settings"></i></button>
+    </div>
+
+    <!-- NEWS BAR — bottom -->
+    <div class="news-bar">
+      <div class="news-bar-top">
+        <div class="news-bar-label"><i class="ti ti-rss" style="font-size:11px"></i>haberler</div>
+        <div class="news-cats" id="news-cats"></div>
+      </div>
+      <div class="news-scroll" id="news-scroll">
+        <div style="font-size:11px;color:var(--muted2);padding:10px 4px"><span class="ld">yükleniyor···</span></div>
+      </div>
     </div>
   </div>
-</div>
 
 </div><!-- /.page -->
 
@@ -578,7 +774,6 @@ function saveFav(){
 /* ── TODO DRAWER ── */
 const TODO_KEY='sp_todo_v2';
 let todos=[];
-/* Migrate v1 → v2 */
 (function(){
   try{
     const s=localStorage.getItem('sp_todo_v1');
@@ -710,7 +905,6 @@ function renderNewsCatSel(){
 }
 renderNewsCats();
 
-/* drag-to-scroll */
 (function(){
   const el=$('news-scroll');
   let down=false,sx=0,sl=0;
@@ -863,6 +1057,81 @@ function saveStock(){
 
 fetchBIST();
 setInterval(fetchBIST,2*60*1000);
+
+/* ── RAIL ── */
+let activePanel = null;
+document.querySelectorAll('.rail-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const id = btn.dataset.panel;
+    if (activePanel === id) {
+      activePanel = null;
+      document.getElementById('side-panel').classList.remove('open');
+      document.querySelectorAll('.rail-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.sp-content').forEach(c => c.classList.remove('active'));
+    } else {
+      activePanel = id;
+      document.getElementById('side-panel').classList.add('open');
+      document.querySelectorAll('.rail-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.sp-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('sp-' + id).classList.add('active');
+    }
+  });
+});
+
+/* ── CALCULATOR ── */
+const calcState = { display:'0', expr:'', op:null, prev:null, newInput:true };
+window.calcPress = function(key) {
+  const s = calcState;
+  if ('0123456789'.includes(key)) {
+    if (s.newInput) { s.display = key; s.newInput = false; }
+    else if (s.display === '0') s.display = key;
+    else s.display += key;
+  } else if (key === '.') {
+    if (s.newInput) { s.display = '0.'; s.newInput = false; }
+    else if (!s.display.includes('.')) s.display += '.';
+  } else if ('+-×÷'.includes(key)) {
+    if (s.op && !s.newInput) calcEquals();
+    s.prev = parseFloat(s.display);
+    s.op = key; s.expr = s.display + ' ' + key; s.newInput = true;
+  } else if (key === '=') {
+    calcEquals();
+  } else if (key === 'AC') {
+    s.display = '0'; s.expr = ''; s.op = null; s.prev = null; s.newInput = true;
+  } else if (key === '⌫') {
+    if (!s.newInput && s.display.length > 1) s.display = s.display.slice(0,-1);
+    else { s.display = '0'; s.newInput = true; }
+  } else if (key === '±') {
+    s.display = String(-parseFloat(s.display));
+  } else if (key === '%') {
+    s.display = String(parseFloat(s.display) / 100);
+  }
+  updateCalcDisplay();
+};
+function calcEquals() {
+  const s = calcState;
+  if (s.op === null || s.prev === null) return;
+  const curr = parseFloat(s.display), prev = s.prev;
+  let result;
+  if (s.op === '+') result = prev + curr;
+  else if (s.op === '-') result = prev - curr;
+  else if (s.op === '×') result = prev * curr;
+  else if (s.op === '÷') result = curr !== 0 ? prev / curr : NaN;
+  s.expr = prev + ' ' + s.op + ' ' + curr + ' =';
+  s.display = isNaN(result) ? 'Hata' : String(parseFloat(result.toFixed(10)));
+  s.op = null; s.prev = null; s.newInput = true;
+}
+function updateCalcDisplay() {
+  document.getElementById('calc-display').textContent = calcState.display;
+  document.getElementById('calc-expr').textContent = calcState.expr || ' ';
+}
+document.addEventListener('keydown', e => {
+  if (activePanel !== 'calc') return;
+  if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
+  const map = {'0':'0','1':'1','2':'2','3':'3','4':'4','5':'5','6':'6','7':'7','8':'8','9':'9',
+    '.':'.','Enter':'=','Backspace':'⌫','Escape':'AC','+':'+','-':'-','*':'×','/':'÷','%':'%'};
+  if (map[e.key]) { e.preventDefault(); calcPress(map[e.key]); }
+});
 </script>
 </body>
 </html>
