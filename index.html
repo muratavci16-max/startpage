@@ -90,6 +90,13 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',system-ui,s
 .sp-hd-ext:hover{color:var(--accent);}
 
 .sp-iframe{flex:1;width:100%;border:none;display:block;}
+.sp-launch{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:32px 24px;text-align:center}
+.sp-launch-icon{width:76px;height:76px;border-radius:22px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:38px}
+.sp-launch-name{font-size:17px;font-weight:600;color:var(--text)}
+.sp-launch-desc{font-size:12px;color:var(--muted2);line-height:1.65;max-width:230px}
+.sp-launch-btn{background:var(--accent);border:none;border-radius:12px;padding:12px 28px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .13s;display:flex;align-items:center;gap:8px}
+.sp-launch-btn:hover{background:var(--accent-dk)}
+.sp-launch-note{font-size:10px;color:rgba(255,255,255,.18);line-height:1.6;max-width:220px}
 
 /* Borsa panel */
 .sp-borsa-inner{flex:1;overflow-y:auto;scrollbar-width:none;padding:10px 11px 12px;}
@@ -412,9 +419,16 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',system-ui,s
     <div class="sp-content" id="sp-whatsapp">
       <div class="sp-hd">
         <div class="sp-hd-title"><i class="ti ti-brand-whatsapp"></i>WhatsApp Web</div>
-        <a href="https://web.whatsapp.com" target="_blank" class="sp-hd-ext" title="Yeni sekmede aç"><i class="ti ti-external-link"></i></a>
       </div>
-      <iframe class="sp-iframe" src="https://web.whatsapp.com" allow="camera;microphone"></iframe>
+      <div class="sp-launch">
+        <div class="sp-launch-icon" style="color:#25d366;border-color:rgba(37,211,102,.2);background:rgba(37,211,102,.07)"><i class="ti ti-brand-whatsapp"></i></div>
+        <div class="sp-launch-name">WhatsApp Web</div>
+        <div class="sp-launch-desc">Telefonunuzdaki WhatsApp hesabınıza web üzerinden erişin.</div>
+        <button class="sp-launch-btn" onclick="window.open('https://web.whatsapp.com','wa_popup','width=430,height=720,left=120,top=40')">
+          <i class="ti ti-external-link"></i>Popup'ta Aç
+        </button>
+        <div class="sp-launch-note">Güvenlik politikası nedeniyle bu panel içinde gömülü açılamıyor</div>
+      </div>
     </div>
 
     <!-- WORDLE PANEL -->
@@ -430,18 +444,32 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',system-ui,s
     <div class="sp-content" id="sp-telegram">
       <div class="sp-hd">
         <div class="sp-hd-title"><i class="ti ti-brand-telegram"></i>Telegram Web</div>
-        <a href="https://web.telegram.org" target="_blank" class="sp-hd-ext" title="Yeni sekmede aç"><i class="ti ti-external-link"></i></a>
       </div>
-      <iframe class="sp-iframe" src="https://web.telegram.org/k/"></iframe>
+      <div class="sp-launch">
+        <div class="sp-launch-icon" style="color:#2aabee;border-color:rgba(42,171,238,.2);background:rgba(42,171,238,.07)"><i class="ti ti-brand-telegram"></i></div>
+        <div class="sp-launch-name">Telegram Web</div>
+        <div class="sp-launch-desc">Telegram mesajlarınıza web üzerinden erişin.</div>
+        <button class="sp-launch-btn" onclick="window.open('https://web.telegram.org/k/','tg_popup','width=430,height=720,left=120,top=40')">
+          <i class="ti ti-external-link"></i>Popup'ta Aç
+        </button>
+        <div class="sp-launch-note">Güvenlik politikası nedeniyle bu panel içinde gömülü açılamıyor</div>
+      </div>
     </div>
 
     <!-- SPEEDTEST PANEL -->
     <div class="sp-content" id="sp-speedtest">
       <div class="sp-hd">
         <div class="sp-hd-title"><i class="ti ti-gauge"></i>Hız Testi</div>
-        <a href="https://www.speedtest.net" target="_blank" class="sp-hd-ext" title="Yeni sekmede aç"><i class="ti ti-external-link"></i></a>
       </div>
-      <iframe class="sp-iframe" src="https://www.speedtest.net"></iframe>
+      <div class="sp-launch">
+        <div class="sp-launch-icon" style="color:#141526;background:linear-gradient(135deg,#141526,#1b1b3a);border-color:rgba(255,255,255,.15)"><i class="ti ti-gauge" style="color:#fff"></i></div>
+        <div class="sp-launch-name">Hız Testi</div>
+        <div class="sp-launch-desc">İnternet bağlantınızın download, upload ve ping değerlerini ölçün.</div>
+        <button class="sp-launch-btn" onclick="window.open('https://www.speedtest.net','st_popup','width=500,height=680,left=100,top=60')">
+          <i class="ti ti-external-link"></i>Popup'ta Aç
+        </button>
+        <div class="sp-launch-note">Güvenlik politikası nedeniyle bu panel içinde gömülü açılamıyor</div>
+      </div>
     </div>
 
     <!-- CALCULATOR PANEL -->
